@@ -1,0 +1,29 @@
+{% extends ".templates/default.html" %}
+
+
+{% setcontext name="experiments.gray-scott" %}
+{% setcontext title="Gray-Scott Reaction-Diffusion System" %}
+{% setcontext description="Reaction-diffusion system implimentation using the Gray-Scott model." %}
+{% setcontext published=True %}
+
+{% set ext_js=["grayscott.js"] %}
+
+{% block content %}
+<canvas id="cvs"></canvas>
+<form id="settings" action=".">
+    <label for="width">Width:</label><input type="text" id="width">
+    <label for="height">Height:</label><input type="text" id="height"><br>
+    <label for="scale">Scale:</label><input type="text" id="scale">
+    <label for="delay">Delay:</label><input type="text" id="delay"><br>
+    <label for="palette">Palette:</label><select id="palette"><option>:|</option></select><br><br>
+    <label for="boxwscale">BoxW:</label><input type="text" id="boxwscale">
+    <label for="boxhscale">BoxH:</label><input type="text" id="boxhscale"><br><br>
+    <label for="cu">CU:</label><input type="text" id="cu">
+    <label for="cv">CV:</label><input type="text" id="cv"><br>
+    <label for="cf">F:</label><input type="text" id="cf">
+    <label for="ck">K:</label><input type="text" id="ck"><br><br>
+    <label for="clu">ClU:</label><input type="text" id="clu">
+    <label for="clv">ClV:</label><input type="text" id="clv"><br>
+    <input type="submit" value="Reset">
+</form>
+{% endblock %}

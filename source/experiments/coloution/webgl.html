@@ -1,0 +1,27 @@
+{% extends ".templates/default.html" %}
+
+{% setcontext name="experiments.coloution" %}
+{% setcontext title="Coloution" %}
+{% setcontext description="One dimensional, colourful, cellular automata." %}
+
+{% set ext_js=["/js/three.min.js", "coloution_gl.js"] %}
+
+{% block content %}
+<canvas id="cvs"></canvas><br>
+<form>
+    <input id="randomize" type="button" value="randomize">
+    <input id="toggle_history" type="button" value="hide history">
+</form>
+
+<script id="vertexShader" type="x-shader/x-vertex">
+// <![CDATA[
+{% include "experiments/coloution/coloution.vert" %}
+// ]]>
+</script>
+
+<script id="fragmentShader" type="x-shader/x-fragment">
+// <![CDATA[
+{% include "experiments/coloution/coloution.frag" %}
+// ]]>
+</script>
+{% endblock %}

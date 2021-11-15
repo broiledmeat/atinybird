@@ -1,0 +1,21 @@
+{% extends ".templates/default.html" %}
+
+{% setcontext name="experiments.som" %}
+{% setcontext title="Self Organizing Map" %}
+{% setcontext description="Simple self organizing map." %}
+{% setcontext published=True %}
+
+{% set ext_js=["som.js"] %}
+{% set ext_css=["som.css"] %}
+
+{% block content %}
+<canvas id="cvs"></canvas><br>
+<canvas id="status_cvs"></canvas>
+<form id="settings" action=".">
+    <label for="samples">Samples:</label><input type="text" id="samples"><br>
+    <label for="size">Size:</label><input type="text" id="size"><br>
+    <label for="scale">Scale:</label><input type="text" id="scale">
+    <label for="delay">Delay:</label><input type="text" id="delay"><br>
+    <input type="submit" value="Reset">
+</form>
+{% endblock %}

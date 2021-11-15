@@ -1,0 +1,23 @@
+{% extends ".templates/default.html" %}
+
+{% setcontext name="experiments.convectiondiffusion" %}
+{% setcontext title="Convection Diffusion" %}
+{% setcontext description="Convection-diffusion system implimentation." %}
+{% setcontext published=True %}
+
+{% set ext_css=["convectiondiffusion.css"] %}
+{% set ext_js=["/js/simplexnoise.js", "convectiondiffusion.js"] %}
+
+{% block content %}
+<canvas id="cvs"></canvas>
+<form id="settings">
+    <label for="width">Width:</label><input type="text" id="width">
+    <label for="height">Height:</label><input type="text" id="height"><br>
+    <label for="scale">Scale:</label><input type="text" id="scale">
+    <label for="delay">Delay:</label><input type="text" id="delay"><br>
+    <label for="palette">Palette:</label><select id="palette"><option>:|</option></select><br><br>
+    <label for="cu">CU:</label><input type="text" id="cu"><br>
+    <label for="strength">Strength:</label><input type="text" id="strength"><br><br>
+    <input type="submit" value="Reset">
+</form>
+{% endblock %}

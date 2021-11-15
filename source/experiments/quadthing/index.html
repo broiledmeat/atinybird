@@ -1,0 +1,20 @@
+{% extends ".templates/default.html" %}
+{% set title="Quad Tree Thing" %}
+{% set ext_js=["/js/qleaf.js", "quadthing.js"] %}
+{% block content %}
+<canvas id="cvs"></canvas>
+<form id="settings" action=".">
+    <label for="palette">Palette:</label><select id="palette"><option>:|</option></select><br>
+    <label for="elements">Elements:</label><input id="elements" type="text"><br>
+    <label for="pernode">Max Per Node:</label><input id="pernode" type="text"><br>
+    <label for="maxdepth">Max Depth:</label><input id="maxdepth" type="text"><br>
+    <input type="submit" value="Refresh">
+</form>
+<form id="create" action=".">
+    <input type="submit" value="Create Random Elements">
+</form>
+<form id="delete" action=".">
+    <input type="submit" value="Delete Random Elements">
+</form>
+<div id="status"></div>
+{% endblock %}

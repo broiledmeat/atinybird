@@ -1,0 +1,11 @@
+input[type=text]
+{
+	width:		    3.5em;
+}
+label
+{
+	display:	    inline-block;
+	width:		    4.5em;
+	margin-right:	2px;
+	text-align: 	right;
+}

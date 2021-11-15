@@ -1,0 +1,16 @@
+{% extends ".templates/default.html" %}
+
+{% setcontext name="experiments.wonderdream" %}
+{% setcontext title="Wonder Dream" %}
+{% setcontext description=":]" %}
+{% setcontext published=False %}
+
+{% set ext_css=["wonderdream.css"] %}
+{% set ext_js=["/js/simplexnoise.js", "fluid.js", "wonderdream.js"] %}
+
+{% block content %}
+<canvas id="cvs"></canvas>
+<form id="settings">
+    <input type="submit" value="Reset">
+</form>
+{% endblock %}

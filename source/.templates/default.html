@@ -1,0 +1,18 @@
+{% extends ".templates/base.html" %}
+{% set template_only=True %}
+
+{% block main %}
+    <header>
+        <a href="/">
+            <img src="/img/icon-microbird.png">atinybird
+        </a>
+    </header>
+    <section>
+        {% if title %}
+            <header>
+                {{ title }}
+            </header>
+        {% endif %}
+        {% block content %}{% endblock %}
+    </section>
+{% endblock %}

@@ -1,0 +1,59 @@
+html
+{
+    margin: 1ex;
+    background: #f9f9f9;
+    color: #555555;
+    font-family: 'Verdana', sans-serif;
+    font-size: 0.95em;
+}
+
+body
+{
+    margin: 0;
+}
+
+a
+{
+    color: #aa3333;
+    text-decoration: none;
+}
+
+a:hover, a:active
+{
+    color: #881111;
+    background: #f5f5f5;
+}
+
+img
+{
+    padding: 2px;
+    background: #f5f5f5;
+    border: 1px solid #cccccc;
+}
+
+.file
+{
+    display: block;
+    margin-bottom: 0.5em;
+}
+
+.thumb
+{
+    display: inline-block;
+    width: 248px;
+    text-align: right;
+    vertical-align: top;
+}
+
+.info
+{
+    display: inline-block;
+}
+
+.subdued
+{
+    display: inline-block;
+    margin-top: 0.25em;
+    font-size: 0.7em;
+    color: #dddddd;
+}

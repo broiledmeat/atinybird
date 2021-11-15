@@ -1,0 +1,20 @@
+{% extends ".templates/default.html" %}
+
+{% setcontext name="experiments.plantfriends" %}
+{% setcontext title="Plant Friends" %}
+{% setcontext description="More colour inheritence, but on a two dimensional plane." %}
+{% setcontext published=True %}
+
+{% set ext_js=["/js/qleaf.js", "plantfriends.js", "plantfriends.normal.js"] %}
+
+{% block content %}
+Simulates generational evolution and migration of 'plants.' Each plant has a
+low probability of mating with a close neighbor, and spawning a new plant
+nearby with colour elements of both parents. With a random initial field,
+similar coloured neighborhoods will form.<br><br>
+
+<canvas id="cvs"></canvas>
+<canvas id="stats_cvs"></canvas><br>
+<input id="enable_audio" type="checkbox"><label for="enable_audio">Audio</label><br><br>
+<a href="#" onclick="goFullscreen();">Fullscreen</a>&nbsp;(stops this and launches a fullscreen version)
+{% endblock %}

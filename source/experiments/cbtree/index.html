@@ -1,0 +1,18 @@
+{% extends ".templates/default.html" %}
+
+{% setcontext name="experiments.cbtree" %}
+{% setcontext title="CB Tree" %}
+{% setcontext description="Pathetic tree generator." %}
+{% setcontext published=True %}
+
+{% set ext_js=["cbtree.js"] %}
+
+{% block content %}
+<canvas id="cvs"></canvas><br>
+<form id="settings" action=".">
+    <label for="initial_u">Age:</label><input type="text" id="initial_u"><br>
+    <label for="grow_t">Scraggliness:</label><input type="text" id="grow_t"><br>
+    <label for="branch_d">Branchiness:</label><input type="text" id="branch_d"><br>
+    <input type="submit" value="Generate">
+</form>
+{% endblock %}

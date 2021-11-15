@@ -1,0 +1,33 @@
+body section#header p
+{
+    margin: 0 0 0.5em 0;
+}
+
+body section#games table
+{
+    border:         none;
+    border-spacing: 0;
+    margin:         0.25em 0 0 1.75em;
+    padding:        0;
+}
+
+body section#games table tr
+{
+    width:      100%;
+    list-style: none;
+    overflow:   hidden;
+    margin:     0 0 0.5em 0;
+}
+
+body section#games table tr td:not(:first-child)
+{
+    padding-left: 8px;
+    color:        #ccc;
+}
+
+body section#games table tr:not(:first-child) td
+{
+    padding-top: 2px;
+    border-top:  1px dotted #aaaaaa;
+}
+

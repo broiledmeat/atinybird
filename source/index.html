@@ -1,0 +1,52 @@
+{% extends ".templates/default.html" %}
+
+{% block content %}
+<section>
+    Hello my future girlfriend, my name is Derrick Staples. I enjoy playing with
+    code, climbing on things I should not, running, caster-boarding, and twirling
+    things around like a baton girl on a cheerleading squad.<br><br>
+    atinybird is mostly just an experiment and file dump; there is not much here
+    with fleshed out content. If anything seems remotely interesting however,
+    please feel free to <a href="/cheep.html">contact me</a>.
+</section>
+
+<section>
+    <header>
+        <img src="/img/icon-fat.png">
+        Projects
+    </header>
+    {% include "projects.html" %}
+</section>
+
+<section>
+    <header>
+        <img src="/img/icon-butterfly.png">
+        Experiments
+    </header>
+    {% include "experiments.html" %}
+</section>
+
+<section>
+    <header>
+        <img src="/img/icon-duck.png">
+        <a href="/nest/art/">Art</a>
+    </header>
+    <ul>
+        <li>Random art produced in spurts.</li>
+    </ul>
+</section>
+
+<section>
+    <header>
+        <img src="/img/icon-baby-bird.png">
+        <a href="/nest/">Nest</a>
+    </header>
+    <ul>
+        <li>File dump with pretty thumbnails.</li>
+    </ul>
+</section>
+
+<footer>
+    powered by nginx, pydgeot, and ennui. <a class="subdued" href="/cheep.html">cheep cheep</a>
+</footer>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends ".templates/default.html" %}
+
+{% setcontext name="experiments.dungen" %}
+{% setcontext title="DunGen" %}
+{% setcontext description="Map generation experiments." %}
+{% setcontext published=True %}
+
+{% set ext_js=["dungen.js", "simple.js"] %}
+
+{% block content %}
+<canvas id="canvas"></canvas>
+<form id="settings" action=".">
+    <label for="generator">Type:</label><select id="generator"><option>:|</option></select><br>
+    <input type="submit" value="Refresh">
+</form>
+<div id="log"></div>
+{% endblock %}
