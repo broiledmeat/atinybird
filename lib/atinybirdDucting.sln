@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "atinybirdDucting", "atinybirdDucting\atinybirdDucting.csproj", "{37965FC1-2BAD-4BFD-BEC3-B96885890AE0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ductwork", "..\..\ductwork\src\ductwork\ductwork.csproj", "{8EC113E3-9E14-45AB-8A41-3116F1769EEF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ductworkCLI", "..\..\ductwork\src\ductworkCLI\ductworkCLI.csproj", "{F8F3F4F5-E2D5-4E7F-B107-0E647FCFED1F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{37965FC1-2BAD-4BFD-BEC3-B96885890AE0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{37965FC1-2BAD-4BFD-BEC3-B96885890AE0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{37965FC1-2BAD-4BFD-BEC3-B96885890AE0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{37965FC1-2BAD-4BFD-BEC3-B96885890AE0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8EC113E3-9E14-45AB-8A41-3116F1769EEF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8EC113E3-9E14-45AB-8A41-3116F1769EEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8EC113E3-9E14-45AB-8A41-3116F1769EEF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8EC113E3-9E14-45AB-8A41-3116F1769EEF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F8F3F4F5-E2D5-4E7F-B107-0E647FCFED1F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8F3F4F5-E2D5-4E7F-B107-0E647FCFED1F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8F3F4F5-E2D5-4E7F-B107-0E647FCFED1F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8F3F4F5-E2D5-4E7F-B107-0E647FCFED1F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
