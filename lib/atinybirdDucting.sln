@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ductwork", "..\..\ductwork\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ductworkCLI", "..\..\ductwork\src\ductworkCLI\ductworkCLI.csproj", "{F8F3F4F5-E2D5-4E7F-B107-0E647FCFED1F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ductworkTests", "..\..\ductwork\src\ductworkTests\ductworkTests\ductworkTests.csproj", "{4BB96DD1-835D-4B97-A7BB-0CD9711B3671}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{F8F3F4F5-E2D5-4E7F-B107-0E647FCFED1F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F8F3F4F5-E2D5-4E7F-B107-0E647FCFED1F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F8F3F4F5-E2D5-4E7F-B107-0E647FCFED1F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4BB96DD1-835D-4B97-A7BB-0CD9711B3671}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4BB96DD1-835D-4B97-A7BB-0CD9711B3671}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4BB96DD1-835D-4B97-A7BB-0CD9711B3671}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4BB96DD1-835D-4B97-A7BB-0CD9711B3671}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
