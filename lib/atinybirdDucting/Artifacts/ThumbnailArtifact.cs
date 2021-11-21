@@ -9,7 +9,7 @@ using SixLabors.ImageSharp.Processing;
 #nullable enable
 namespace atinybirdDucting.Artifacts
 {
-    public class ThumbnailArtifact : Artifact
+    public class ThumbnailArtifact : IFinalizingArtifact
     {
         public readonly string SourcePath;
         public readonly string TargetPath;
@@ -25,11 +25,11 @@ namespace atinybirdDucting.Artifacts
             ContentId = $"{info.Length};{info.LastWriteTimeUtc};{Size.Width}x{Size.Height}";
         }
 
-        public override string Id => TargetPath;
+        public string Id => TargetPath;
         
-        public override string ContentId { get; }
+        public string ContentId { get; }
         
-        public override bool RequiresFinalize()
+        public bool RequiresFinalize()
         {
             if (!File.Exists(TargetPath))
             {
@@ -42,7 +42,7 @@ namespace atinybirdDucting.Artifacts
             return sourceInfo.LastWriteTimeUtc != targetInfo.LastWriteTimeUtc;
         }
 
-        public override async Task<bool> Finalize(CancellationToken token)
+        public async Task<bool> Finalize(CancellationToken token)
         {
             var dir = Path.GetDirectoryName(TargetPath);
 

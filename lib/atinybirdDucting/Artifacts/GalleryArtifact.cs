@@ -16,7 +16,7 @@ using Scriban.Runtime;
 #nullable enable
 namespace atinybirdDucting.Artifacts
 {
-    public class GalleryArtifact : Artifact
+    public class GalleryArtifact : IFinalizingArtifact
     {
         public readonly string SourceRoot;
         public readonly HashSet<string> Directories;
@@ -60,10 +60,10 @@ namespace atinybirdDucting.Artifacts
             ContentId = crc.ToString();
         }
 
-        public override string Id => TargetPath;
-        public override string ContentId { get; }
+        public string Id => TargetPath;
+        public string ContentId { get; }
 
-        public override async Task<bool> Finalize(CancellationToken token)
+        public async Task<bool> Finalize(CancellationToken token)
         {
             var template = GetTemplate();
 

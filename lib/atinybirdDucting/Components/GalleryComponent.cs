@@ -11,17 +11,17 @@ using ductwork.Components;
 #nullable enable
 namespace atinybirdDucting.Components
 {
-    public class GalleryComponent : SingleInSingleOutComponent<FinalizedResult, Artifact>
+    public class GalleryComponent : SingleInSingleOutComponent<FinalizedResult, GalleryArtifact>
     {
         private readonly object _lock = new();
         private readonly Dictionary<string, Dictionary<string, string>> _files = new();
         private readonly Dictionary<string, string> _thumbnails = new();
-
+    
         public string SourceRoot { get; }
         public string TargetRoot { get; }
         public string TemplateName { get; }
         public string OutputName { get; }
-
+    
         public GalleryComponent(string sourceRoot, string targetRoot, string templateName, string outputName)
         {
             SourceRoot = sourceRoot;
@@ -29,26 +29,26 @@ namespace atinybirdDucting.Components
             TemplateName = templateName;
             OutputName = outputName;
         }
-
-        public override Task ExecuteIn(Graph graph, FinalizedResult value, CancellationToken token)
+    
+        protected override Task ExecuteIn(Graph graph, FinalizedResult value, CancellationToken token)
         {
             if (value.State == FinalizedResult.FinalizedState.Failed)
             {
                 return Task.CompletedTask;
             }
-
+    
             if (value.Artifact is CopyFileArtifact copyFileArtifact)
             {
-                var sourceRoot = Path.GetDirectoryName(copyFileArtifact.SourcePath) ?? string.Empty;
-
+                var sourceRoot = Path.GetDirectoryName(copyFileArtifact.FilePath) ?? string.Empty;
+    
                 lock (_lock)
                 {
                     if (!_files.ContainsKey(sourceRoot))
                     {
                         _files[sourceRoot] = new Dictionary<string, string>();
                     }
-
-                    _files[sourceRoot].Add(copyFileArtifact.SourcePath, copyFileArtifact.TargetPath);
+    
+                    _files[sourceRoot].Add(copyFileArtifact.FilePath, copyFileArtifact.TargetFilePath);
                 }
             }
             else if (value.Artifact is ThumbnailArtifact genThumbArtifact)
@@ -58,11 +58,11 @@ namespace atinybirdDucting.Components
                     _thumbnails.Add(genThumbArtifact.SourcePath, genThumbArtifact.TargetPath);
                 }
             }
-
+    
             return Task.CompletedTask;
         }
-
-        public override async Task ExecuteComplete(Graph graph, CancellationToken token)
+    
+        protected override async Task ExecuteComplete(Graph graph, CancellationToken token)
         {
             foreach (var (sourceRoot, files) in _files)
             {

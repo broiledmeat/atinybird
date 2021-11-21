@@ -10,14 +10,14 @@
     <component key="Finalizer" type="FinalizeArtifactsComponent"/>
 
     <!-- Path iteration for visible files under /nest/ -->
-    <component key="PathIterator" type="DirectoryIteratorComponent">
+    <component key="PathIterator" type="DirectoryFilePathIteratorComponent">
         <arg type="string">/home/derrick/projects/atinybird/source</arg>
         <arg type="bool">true</arg>
     </component>
-    <component key="IsHiddenPath" type="GlobMatchComponent">
+    <component key="IsHiddenPath" type="FilePathGlobMatchComponent">
         <arg type="string">**/.*</arg>
     </component>
-    <component key="IsNestPath" type="GlobMatchComponent">
+    <component key="IsNestPath" type="FilePathGlobMatchComponent">
         <arg type="string">/nest/**</arg>
     </component>
 
@@ -25,7 +25,7 @@
     <connection out="IsHiddenPath.False" in="IsNestPath.In"/>
     
     <!-- File copying -->
-    <component key="FileCopy" type="CopySourceToTargetComponent">
+    <component key="FileCopy" type="CopyFilePathToTargetPathComponent">
         <arg type="string">/home/derrick/projects/atinybird/source</arg>
         <arg type="string">/home/derrick/projects/atinybird/build</arg>
     </component>
