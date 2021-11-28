@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<graph>
+    <lib path="./atinybirdDucting.dll"/>
+
+    <config>
+        <logfile path="/home/derrick/projects/atinybird/store/mainBuild.log"/>
+    </config>
+
+    <!-- Artifact processor -->
+    <component key="Finalizer" type="FinalizeArtifactsComponent"/>
+
+    <!-- Path iteration for visible files under /nest/ -->
+    <component key="PathIterator" type="DirectoryFilePathIteratorComponent">
+        <arg type="string">/home/derrick/projects/atinybird/source</arg>
+        <arg type="bool">true</arg>
+    </component>
+    <component key="IsHiddenPath" type="FilePathGlobMatchComponent">
+        <arg type="string">**/.*/**</arg>
+    </component>
+    <component key="IsTemplatePath" type="FilePathGlobMatchComponent">
+        <arg type="string">**/*.html</arg>
+    </component>
+
+    <connection out="PathIterator.Out" in="IsHiddenPath.In"/>
+    <connection out="IsHiddenPath.False" in="IsTemplatePath.In"/>
+
+    <!-- HTML Templating -->
+    <component key="TemplateParser" type="TemplateParserComponent"/>
+    <component key="TemplateParserComplete" type="InputAwaiterComponent:IFilePathArtifact"/>
+    <component key="TemplateRenderer" type="TemplateRendererComponent">
+        <arg type="string">/home/derrick/projects/atinybird/source</arg>
+        <arg type="string">/home/derrick/projects/atinybird/build</arg>
+    </component>
+
+    <connection out="IsTemplatePath.True" in="TemplateParser.In"/>
+    <connection out="TemplateParser.Out" in="TemplateParserComplete.In"/>
+    <connection out="TemplateParserComplete.Out" in="TemplateRenderer.In"/>
+    <connection out="TemplateRenderer.Out" in="Finalizer.In"/>
+
+        <!-- File copying -->
+        <component key="FileCopy" type="CopyFilePathToTargetPathComponent">
+            <arg type="string">/home/derrick/projects/atinybird/source</arg>
+            <arg type="string">/home/derrick/projects/atinybird/build</arg>
+        </component>
+
+        <connection out="IsTemplatePath.False" in="FileCopy.In"/>
+        <connection out="FileCopy.Out" in="Finalizer.In"/>
+</graph>
