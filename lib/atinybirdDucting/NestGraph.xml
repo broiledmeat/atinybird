@@ -3,7 +3,7 @@
     <lib path="./atinybirdDucting.dll"/>
     
     <config>
-        <logfile path="/home/derrick/projects/atinybird/store/build.log" />
+        <logfile path="/home/derrick/projects/atinybird/store/nestBuild.log" />
     </config>
     
     <!-- Artifact processor -->
@@ -11,41 +11,37 @@
 
     <!-- Path iteration for visible files under /nest/ -->
     <component key="PathIterator" type="DirectoryFilePathIteratorComponent">
-        <arg type="string">/home/derrick/projects/atinybird/source</arg>
+        <arg type="string">/home/derrick/projects/atinybird/source_nest</arg>
         <arg type="bool">true</arg>
     </component>
     <component key="IsHiddenPath" type="FilePathGlobMatchComponent">
         <arg type="string">**/.*</arg>
     </component>
-    <component key="IsNestPath" type="FilePathGlobMatchComponent">
-        <arg type="string">/nest/**</arg>
-    </component>
 
     <connection out="PathIterator.Out" in="IsHiddenPath.In"/>
-    <connection out="IsHiddenPath.False" in="IsNestPath.In"/>
     
     <!-- File copying -->
     <component key="FileCopy" type="CopyFilePathToTargetPathComponent">
-        <arg type="string">/home/derrick/projects/atinybird/source</arg>
-        <arg type="string">/home/derrick/projects/atinybird/build</arg>
+        <arg type="string">/home/derrick/projects/atinybird/source_nest</arg>
+        <arg type="string">/home/derrick/projects/atinybird/build/nest</arg>
     </component>
 
-    <connection out="IsNestPath.True" in="FileCopy.In"/>
+    <connection out="IsHiddenPath.False" in="FileCopy.In"/>
     <connection out="FileCopy.Out" in="Finalizer.In"/>
 
     <!-- Thumbnail generation -->
     <component key="GenerateThumb" type="GenerateThumbnailComponent">
-        <arg type="string">/home/derrick/projects/atinybird/source</arg>
-        <arg type="string">/home/derrick/projects/atinybird/build</arg>
+        <arg type="string">/home/derrick/projects/atinybird/source_nest</arg>
+        <arg type="string">/home/derrick/projects/atinybird/build/nest</arg>
     </component>
 
-    <connection out="IsNestPath.True" in="GenerateThumb.In"/>
+    <connection out="IsHiddenPath.False" in="GenerateThumb.In"/>
     <connection out="GenerateThumb.Out" in="Finalizer.In"/>
     
     <!-- Index generation -->
     <component key="Gallery" type="GalleryComponent">
-        <arg type="string">/home/derrick/projects/atinybird/source</arg>
-        <arg type="string">/home/derrick/projects/atinybird/build</arg>
+        <arg type="string">/home/derrick/projects/atinybird/source_nest</arg>
+        <arg type="string">/home/derrick/projects/atinybird/build/nest</arg>
         <arg type="string">.index.tmpl</arg>
         <arg type="string">index.html</arg>
     </component>
