@@ -1,16 +1,16 @@
-{% extends ".templates/default.html" %}
+{{
+set_context "name" "experiments.coloution"
+set_context "title" "Coloution"
+set_context "description" "One dimensional, colourful, cellular automata."
+ext_js = ["coloution.js"]
+}}
 
-{% setcontext name="experiments.coloution" %}
-{% setcontext title="Coloution" %}
-{% setcontext description="One dimensional, colourful, cellular automata." %}
-{% setcontext published=True %}
-
-{% set ext_js=["coloution.js"] %}
-
-{% block content %}
+{{ capture content }}
 <canvas id="cvs"></canvas><br>
 <form>
     <input id="randomize" type="button" value="randomize">
     <input id="toggle_history" type="button" value="hide history">
 </form>
-{% endblock %}
+{{ end }}
+
+{{ include ".templates/default.html" }}

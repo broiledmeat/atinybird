@@ -1,7 +1,11 @@
-{% extends ".templates/simple.html" %}
-{% set title="Plant Friends" %}
-{% set ext_css=["fullscreen.css"] %}
-{% set ext_js=["/js/qleaf.js", "plantfriends.js", "plantfriends.fullscreen.js"] %}
-{% block content %}
+{{
+title = "Plant Friends"
+ext_css = ["fullscreen.css"]
+ext_js = ["/js/qleaf.js", "plantfriends.js", "plantfriends.fullscreen.js"]
+}}
+
+{{ capture content }}
 <canvas id="cvs"></canvas>
-{% endblock %}
+{{ end }}
+
+{{ include ".templates/simple.html" }}

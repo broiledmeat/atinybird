@@ -1,13 +1,11 @@
-{% extends ".templates/default.html" %}
+{{
+set_context "name" "projects.halfminutegamedeveloper"
+set_context "title" "Half Minute Game Developer"
+set_context "description" "A PICO-8 game created six weeks late for a '30 seconds of fun' themed game jam."
+ext_css = ["halfminutegamedev.css"]
+}}
 
-{% setcontext name="projects.halfminutegamedeveloper" %}
-{% setcontext title="Half Minute Game Developer" %}
-{% setcontext description="A PICO-8 game created six weeks late for a '30 seconds of fun' themed game jam." %}
-{% setcontext published=True %}
-
-{% set ext_css=["halfminutegamedev.css"] %}
-
-{% block content %}
+{{ capture content }}
 Created in <a href="http://www.lexaloffle.com/pico-8.php">PICO-8</a> in one and a half days for a game jam I was
 hideously late for. <a href="halfminutegamedev.p8">Source cart</a>.
 
@@ -54,4 +52,6 @@ hideously late for. <a href="halfminutegamedev.p8">Source cart</a>.
         document.addEventListener('keydown', onKeyDown_blocker, false);
     </script>
 </div>
-{% endblock %}}
+{{ end }}
+
+{{ include ".templates/default.html" }}

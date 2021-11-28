@@ -1,14 +1,12 @@
-{% extends ".templates/default.html" %}
+{{
+set_context "name" "experiments.som"
+set_context "title" "Self Organizing Map"
+set_context "description" "Simple self organizing map."
+ext_js = ["som.js"]
+ext_css = ["som.css"]
+}}
 
-{% setcontext name="experiments.som" %}
-{% setcontext title="Self Organizing Map" %}
-{% setcontext description="Simple self organizing map." %}
-{% setcontext published=True %}
-
-{% set ext_js=["som.js"] %}
-{% set ext_css=["som.css"] %}
-
-{% block content %}
+{{ capture content }}
 <canvas id="cvs"></canvas><br>
 <canvas id="status_cvs"></canvas>
 <form id="settings" action=".">
@@ -18,4 +16,6 @@
     <label for="delay">Delay:</label><input type="text" id="delay"><br>
     <input type="submit" value="Reset">
 </form>
-{% endblock %}
+{{ end }}
+
+{{ include ".templates/default.html" }}

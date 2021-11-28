@@ -1,8 +1,8 @@
-{% set template_only=True %}
-
-{% setcontext name="projects.temperfm" %}
-{% setcontext url_override="https://github.com/broiledmeat/temperfm" %}
-{% setcontext title="TemperFM" %}
-{% setcontext description="Generate mood-over-time data from a users Last.fm listening habits. Additionally, generate
-SVG charts with <a href=\"https://github.com/broiledmeat/temperfm_charts\">TemperFM Charts</a>." %}
-{% setcontext published=True %}
+{{
+set_context "rendererEnable" false
+set_context "name" "projects.temperfm"
+set_context "url" "https://github.com/broiledmeat/temperfm"
+set_context "title" "TemperFM"
+set_context "description" "Generate mood-over-time data from a users Last.fm listening habits. Additionally, generate
+SVG charts with <a href=\"https://github.com/broiledmeat/temperfm_charts\">TemperFM Charts</a>."
+}}

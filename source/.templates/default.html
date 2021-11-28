@@ -1,18 +1,15 @@
-{% extends ".templates/base.html" %}
-{% set template_only=True %}
-
-{% block main %}
+{{- capture body_content ~}}
     <header>
-        <a href="/">
-            <img src="/img/icon-microbird.png">atinybird
-        </a>
+        <a href="/"><img src="/img/icon-microbird.png" alt="">atinybird</a>
     </header>
     <section>
-        {% if title %}
+        {{~ if title -}}
             <header>
-                {{ title }}
+                {{- title -}}
             </header>
-        {% endif %}
-        {% block content %}{% endblock %}
+        {{~ end -}}
+        {{- content -}}
     </section>
-{% endblock %}
+{{~ end -}}
+
+{{- include ".templates/base.html" -}}

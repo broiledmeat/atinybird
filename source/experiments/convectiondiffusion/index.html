@@ -1,14 +1,12 @@
-{% extends ".templates/default.html" %}
+{{
+set_context "name" "experiments.convectiondiffusion"
+set_context "title" "Convection Diffusion"
+set_context "description" "Convection-diffusion system implimentation."
+ext_css = ["convectiondiffusion.css"]
+ext_js = ["/js/simplexnoise.js", "convectiondiffusion.js"]
+}}
 
-{% setcontext name="experiments.convectiondiffusion" %}
-{% setcontext title="Convection Diffusion" %}
-{% setcontext description="Convection-diffusion system implimentation." %}
-{% setcontext published=True %}
-
-{% set ext_css=["convectiondiffusion.css"] %}
-{% set ext_js=["/js/simplexnoise.js", "convectiondiffusion.js"] %}
-
-{% block content %}
+{{ capture content }}
 <canvas id="cvs"></canvas>
 <form id="settings">
     <label for="width">Width:</label><input type="text" id="width">
@@ -20,4 +18,6 @@
     <label for="strength">Strength:</label><input type="text" id="strength"><br><br>
     <input type="submit" value="Reset">
 </form>
-{% endblock %}
+{{ end }}
+
+{{ include ".templates/default.html" }}

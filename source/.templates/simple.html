@@ -1,6 +1,5 @@
-{% extends ".templates/base.html" %}
-{% set template_only=True %}
+{{ capture body_content }}
+	{{ content }}
+{{ end }}
 
-{% block main %}
-	{% block content %}{% endblock %}
-{% endblock %}
+{{- include ".templates/base.html" -}}

@@ -1,12 +1,12 @@
-{% extends ".templates/default.html" %}
+{{
+set_context "name" "experiments.coloution_webgl"
+set_context "title" "Coloution WebGL"
+set_context "description" "One dimensional, colourful, cellular automata."
+set_context "published" false
+ext_js = ["/js/three.min.js", "coloution_gl.js"]
+}}
 
-{% setcontext name="experiments.coloution" %}
-{% setcontext title="Coloution" %}
-{% setcontext description="One dimensional, colourful, cellular automata." %}
-
-{% set ext_js=["/js/three.min.js", "coloution_gl.js"] %}
-
-{% block content %}
+{{ capture content }}
 <canvas id="cvs"></canvas><br>
 <form>
     <input id="randomize" type="button" value="randomize">
@@ -15,13 +15,15 @@
 
 <script id="vertexShader" type="x-shader/x-vertex">
 // <![CDATA[
-{% include "experiments/coloution/coloution.vert" %}
+{% include "experiments/coloution/coloution.vert"
 // ]]>
 </script>
 
 <script id="fragmentShader" type="x-shader/x-fragment">
 // <![CDATA[
-{% include "experiments/coloution/coloution.frag" %}
+{% include "experiments/coloution/coloution.frag"
 // ]]>
 </script>
-{% endblock %}
+{{ end }}
+
+{{ include ".templates/default.html" }}

@@ -1,13 +1,11 @@
-{% extends ".templates/default.html" %}
+{{
+set_context "name" "experiments.cbtree"
+set_context "title" "CB Tree"
+set_context "description""Pathetic tree generator."
+ext_js = ["cbtree.js"]
+}}
 
-{% setcontext name="experiments.cbtree" %}
-{% setcontext title="CB Tree" %}
-{% setcontext description="Pathetic tree generator." %}
-{% setcontext published=True %}
-
-{% set ext_js=["cbtree.js"] %}
-
-{% block content %}
+{{ capture content }}
 <canvas id="cvs"></canvas><br>
 <form id="settings" action=".">
     <label for="initial_u">Age:</label><input type="text" id="initial_u"><br>
@@ -15,4 +13,6 @@
     <label for="branch_d">Branchiness:</label><input type="text" id="branch_d"><br>
     <input type="submit" value="Generate">
 </form>
-{% endblock %}
+{{ end }}
+
+{{ include ".templates/default.html" }}

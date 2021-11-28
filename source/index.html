@@ -1,6 +1,16 @@
-{% extends ".templates/default.html" %}
+{{
+func filterUnpublished(vars)
+    ret vars.published != false
+end
+func get_named_contexts(value)
+    ret get_contexts "name" value | array.filter @filterUnpublished | array.sort "title"
+end
 
-{% block content %}
+projects = get_named_contexts "projects.*"
+experiments = get_named_contexts "experiments.*"
+}}
+
+{{ capture content }}
 <section>
     Hello my future girlfriend, my name is Derrick Staples. I enjoy playing with
     code, climbing on things I should not, running, caster-boarding, and twirling
@@ -15,7 +25,14 @@
         <img src="/img/icon-fat.png">
         Projects
     </header>
-    {% include "projects.html" %}
+    <ul>
+        {{~ for vars in projects ~}}
+            <li>
+                <a href="{{ vars.url ?? vars._relPath }}">{{ vars.title }}</a><br>
+                {{ vars.description }}
+            </li>
+        {{~ end ~}}
+    </ul>
 </section>
 
 <section>
@@ -23,7 +40,14 @@
         <img src="/img/icon-butterfly.png">
         Experiments
     </header>
-    {% include "experiments.html" %}
+    <ul>
+        {{~ for vars in experiments ~}}
+        <li>
+            <a href="{{ vars.url ?? vars._relPath }}">{{ vars.title }}</a><br>
+            {{ vars.description }}
+        </li>
+        {{~ end ~}}
+    </ul>
 </section>
 
 <section>
@@ -47,6 +71,8 @@
 </section>
 
 <footer>
-    powered by nginx, pydgeot, and ennui. <a class="subdued" href="/cheep.html">cheep cheep</a>
+    powered by nginx, ductwork, and ennui. <a class="subdued" href="/cheep.html">cheep cheep</a>
 </footer>
-{% endblock %}
+{{ end }}
+
+{{ include ".templates/default.html" }}

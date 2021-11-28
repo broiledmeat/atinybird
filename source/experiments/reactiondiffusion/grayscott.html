@@ -1,14 +1,11 @@
-{% extends ".templates/default.html" %}
+{{
+set_context "name" "experiments.gray-scott"
+set_context "title" "Gray-Scott Reaction-Diffusion System"
+set_context "description" "Reaction-diffusion system implementation using the Gray-Scott model."
+ext_js = ["grayscott.js"]
+}}
 
-
-{% setcontext name="experiments.gray-scott" %}
-{% setcontext title="Gray-Scott Reaction-Diffusion System" %}
-{% setcontext description="Reaction-diffusion system implimentation using the Gray-Scott model." %}
-{% setcontext published=True %}
-
-{% set ext_js=["grayscott.js"] %}
-
-{% block content %}
+{{ capture content }}
 <canvas id="cvs"></canvas>
 <form id="settings" action=".">
     <label for="width">Width:</label><input type="text" id="width">
@@ -26,4 +23,6 @@
     <label for="clv">ClV:</label><input type="text" id="clv"><br>
     <input type="submit" value="Reset">
 </form>
-{% endblock %}
+{{ end }}
+
+{{ include ".templates/default.html" }}
