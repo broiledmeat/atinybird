@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <graph>
-    <lib path="./atinybirdDucting.dll"/>
+    <lib path="./ductworkScriban.dll"/>
 
     <config>
         <logfile path="/home/derrick/projects/atinybird/store/mainBuild.log"/>
@@ -13,16 +13,13 @@
     <component key="PathIterator" type="DirectoryFilePathIteratorComponent">
         <arg type="string">/home/derrick/projects/atinybird/source</arg>
         <arg type="bool">true</arg>
-    </component>
-    <component key="IsHiddenPath" type="FilePathGlobMatchComponent">
-        <arg type="string">**/.*/**</arg>
+        <arg type="bool">false</arg>
     </component>
     <component key="IsTemplatePath" type="FilePathGlobMatchComponent">
         <arg type="string">**/*.html</arg>
     </component>
 
-    <connection out="PathIterator.Out" in="IsHiddenPath.In"/>
-    <connection out="IsHiddenPath.False" in="IsTemplatePath.In"/>
+    <connection out="PathIterator.Out" in="IsTemplatePath.In"/>
 
     <!-- HTML Templating -->
     <component key="TemplateParser" type="TemplateParserComponent"/>
@@ -37,12 +34,12 @@
     <connection out="TemplateParserComplete.Out" in="TemplateRenderer.In"/>
     <connection out="TemplateRenderer.Out" in="Finalizer.In"/>
 
-        <!-- File copying -->
-        <component key="FileCopy" type="CopyFilePathToTargetPathComponent">
-            <arg type="string">/home/derrick/projects/atinybird/source</arg>
-            <arg type="string">/home/derrick/projects/atinybird/build</arg>
-        </component>
+    <!-- File copying -->
+    <component key="FileCopy" type="CopyFilePathToTargetPathComponent">
+        <arg type="string">/home/derrick/projects/atinybird/source</arg>
+        <arg type="string">/home/derrick/projects/atinybird/build</arg>
+    </component>
 
-        <connection out="IsTemplatePath.False" in="FileCopy.In"/>
-        <connection out="FileCopy.Out" in="Finalizer.In"/>
+    <connection out="IsTemplatePath.False" in="FileCopy.In"/>
+    <connection out="FileCopy.Out" in="Finalizer.In"/>
 </graph>

@@ -13,12 +13,8 @@
     <component key="PathIterator" type="DirectoryFilePathIteratorComponent">
         <arg type="string">/home/derrick/projects/atinybird/source_nest</arg>
         <arg type="bool">true</arg>
+        <arg type="bool">false</arg>
     </component>
-    <component key="IsHiddenPath" type="FilePathGlobMatchComponent">
-        <arg type="string">**/.*</arg>
-    </component>
-
-    <connection out="PathIterator.Out" in="IsHiddenPath.In"/>
     
     <!-- File copying -->
     <component key="FileCopy" type="CopyFilePathToTargetPathComponent">
@@ -26,7 +22,7 @@
         <arg type="string">/home/derrick/projects/atinybird/build/nest</arg>
     </component>
 
-    <connection out="IsHiddenPath.False" in="FileCopy.In"/>
+    <connection out="PathIterator.Out" in="FileCopy.In"/>
     <connection out="FileCopy.Out" in="Finalizer.In"/>
 
     <!-- Thumbnail generation -->
@@ -35,7 +31,7 @@
         <arg type="string">/home/derrick/projects/atinybird/build/nest</arg>
     </component>
 
-    <connection out="IsHiddenPath.False" in="GenerateThumb.In"/>
+    <connection out="PathIterator.Out" in="GenerateThumb.In"/>
     <connection out="GenerateThumb.Out" in="Finalizer.In"/>
     
     <!-- Index generation -->
