@@ -7,12 +7,13 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\..\ductwork\src\ductworkCLI\ductworkCLI.csproj" />
+      <ProjectReference Include="..\..\..\ductwork\src\ductworkScriban\ductworkScriban.csproj" />
       <ProjectReference Include="..\..\..\ductwork\src\ductwork\ductwork.csproj" />
     </ItemGroup>
 
     <ItemGroup>
       <PackageReference Include="Crc32.NET" Version="1.2.0" />
-      <PackageReference Include="Glob" Version="1.2.0-alpha0037" />
       <PackageReference Include="Scriban" Version="5.0.0" />
       <PackageReference Include="SixLabors.ImageSharp" Version="1.0.4" />
       <PackageReference Include="System.Data.SQLite" Version="1.0.115.5" />
