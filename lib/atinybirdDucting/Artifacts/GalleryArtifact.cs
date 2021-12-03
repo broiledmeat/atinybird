@@ -11,6 +11,7 @@ using ductwork.Artifacts;
 using SixLabors.ImageSharp;
 using Force.Crc32;
 using Scriban;
+using Scriban.Functions;
 using Scriban.Runtime;
 
 #nullable enable
@@ -30,7 +31,7 @@ namespace atinybirdDucting.Artifacts
         public string GalleryTargetRoot { get; }
         public string GalleryTemplateName { get; }
         public string GalleryOutputName { get; }
-        
+
         public GalleryArtifact(
             string gallerySourceRoot,
             string galleryTargetRoot,
@@ -43,7 +44,7 @@ namespace atinybirdDucting.Artifacts
             GallerySourceRoot = gallerySourceRoot;
             GalleryTargetRoot = galleryTargetRoot;
             GalleryTemplateName = galleryTemplateName;
-            GalleryOutputName = galleryOutputName;                
+            GalleryOutputName = galleryOutputName;
             SourceRoot = sourceRoot;
             Directories = directories;
             Files = files;
@@ -90,17 +91,15 @@ namespace atinybirdDucting.Artifacts
             await Task.WhenAll(directoryTasks);
             await Task.WhenAll(fileTasks);
 
-            var context = new TemplateContext();
-            context.PushGlobal(new ScriptObject
+            var script = new BuiltinFunctions
             {
-                { "current", new PathObject(TargetRoot) },
-                { "directories", directoryTasks.Select(task => task.Result) },
-                { "files", fileTasks.Select(task => task.Result) },
-            });
+                {"current", new PathObject(TargetRoot)},
+                {"directories", directoryTasks.Select(task => task.Result)},
+                {"files", fileTasks.Select(task => task.Result)}
+            };
 
+            var context = new TemplateContext(script);
             var content = await template.RenderAsync(context) ?? string.Empty;
-
-            content += string.Join("\n", template.Messages);
 
             await File.WriteAllTextAsync(TargetPath, content, token);
 
@@ -114,7 +113,7 @@ namespace atinybirdDucting.Artifacts
             lock (TemplateCacheLock)
             {
                 string? templatePath = null;
-                
+
                 while (true)
                 {
                     templatePath = Path.Join(currentRoot, GalleryTemplateName);
@@ -138,9 +137,9 @@ namespace atinybirdDucting.Artifacts
                 }
 
                 var template = Template.Parse(File.ReadAllText(templatePath));
-                
+
                 TemplateCache.Add(templatePath, template);
-                
+
                 return template;
             }
         }
@@ -217,11 +216,11 @@ namespace atinybirdDucting.Artifacts
                 else if (name.ToLower().StartsWith("datetime") && value is string strValue)
                 {
                     if (DateTime.TryParseExact(
-                        strValue,
-                        "yyyy:MM:dd HH:mm:ss",
-                        CultureInfo.InvariantCulture,
-                        DateTimeStyles.AssumeLocal,
-                        out var datetimeValue))
+                            strValue,
+                            "yyyy:MM:dd HH:mm:ss",
+                            CultureInfo.InvariantCulture,
+                            DateTimeStyles.AssumeLocal,
+                            out var datetimeValue))
                     {
                         value = datetimeValue;
                     }

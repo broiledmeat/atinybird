@@ -20,22 +20,22 @@ namespace atinybirdDucting.Artifacts
             SourcePath = sourcePath;
             TargetPath = targetPath;
             Size = size ?? new Size(240, 160);
-            
+
             var info = new FileInfo(SourcePath);
             ContentId = $"{info.Length};{info.LastWriteTimeUtc};{Size.Width}x{Size.Height}";
         }
 
         public string Id => TargetPath;
-        
+
         public string ContentId { get; }
-        
+
         public bool RequiresFinalize()
         {
             if (!File.Exists(TargetPath))
             {
                 return true;
             }
-            
+
             var sourceInfo = new FileInfo(SourcePath);
             var targetInfo = new FileInfo(TargetPath);
 
@@ -52,7 +52,6 @@ namespace atinybirdDucting.Artifacts
             }
 
             var sourceInfo = new FileInfo(SourcePath);
-            
 
             if (!Directory.Exists(SourcePath) && File.Exists(SourcePath))
             {
@@ -70,21 +69,25 @@ namespace atinybirdDucting.Artifacts
                 catch (ArgumentOutOfRangeException)
                 {
                     // Image dimensions larger than int64.
-                    throw new InvalidOperationException("Image is too large to load.");
+                    throw new Exception("Image is too large to load.");
                 }
                 catch (UnknownImageFormatException)
                 {
+                    return false;
                 }
             }
 
             if (!File.Exists(TargetPath))
             {
-                return false;
+                throw new Exception("Target thumbnail is missing.");
             }
-            
+
             File.SetLastWriteTimeUtc(TargetPath, sourceInfo.LastWriteTimeUtc);
-            
+
             return true;
         }
+
+        public override string ToString() =>
+            $"{nameof(ThumbnailArtifact)} {{ SourcePath = {SourcePath}, TargetPath = {TargetPath} }}";
     }
 }
