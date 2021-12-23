@@ -8,7 +8,7 @@ using ductwork.Components;
 
 namespace atinybirdDucting.Components
 {
-    public class GenerateThumbnailComponent : SingleInSingleOutComponent<IFilePathArtifact, ThumbnailArtifact>
+    public class GenerateThumbnailComponent : SingleInSingleOutComponent
     {
         public string SourceRoot { get; }
         public string TargetRoot { get; }
@@ -19,15 +19,21 @@ namespace atinybirdDucting.Components
             TargetRoot = targetRoot;
         }
         
-        protected override async Task ExecuteIn(Graph graph, IFilePathArtifact value, CancellationToken token)
+        protected override async Task ExecuteIn(Graph graph, IArtifact artifact, CancellationToken token)
         {
-            var relativePath = Path.GetRelativePath(SourceRoot, value.FilePath); 
+            if (artifact is not IFilePathArtifact filePathArtifact)
+            {
+                return;
+            }
+            
+            var relativePath = Path.GetRelativePath(SourceRoot, filePathArtifact.FilePath); 
             var targetPath = Path.Combine(
                 TargetRoot, 
                 Path.GetDirectoryName(relativePath) ?? string.Empty,
                 ".thumb",
                 Path.GetFileNameWithoutExtension(relativePath) + ".png");
-            await graph.Push(Out, new ThumbnailArtifact(value.FilePath, targetPath));
+            var thumbnailArtifact = new ThumbnailArtifact(filePathArtifact.FilePath, targetPath);
+            await graph.Push(Out, thumbnailArtifact);
         }
     }
 }

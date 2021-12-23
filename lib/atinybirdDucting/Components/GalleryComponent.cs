@@ -11,7 +11,7 @@ using ductwork.Components;
 #nullable enable
 namespace atinybirdDucting.Components
 {
-    public class GalleryComponent : SingleInSingleOutComponent<FinalizedResult, GalleryArtifact>
+    public class GalleryComponent : SingleInSingleOutComponent
     {
         private readonly object _lock = new();
         private readonly Dictionary<string, Dictionary<string, string>> _files = new();
@@ -30,14 +30,19 @@ namespace atinybirdDucting.Components
             OutputName = outputName;
         }
     
-        protected override Task ExecuteIn(Graph graph, FinalizedResult value, CancellationToken token)
+        protected override Task ExecuteIn(Graph graph, IArtifact artifact, CancellationToken token)
         {
-            if (value.State == FinalizedResult.FinalizedState.Failed)
+            if (artifact is not FinalizedResult finalizedResult)
+            {
+                return Task.CompletedTask;
+            }
+            
+            if (finalizedResult.State == FinalizedResult.FinalizedState.Failed)
             {
                 return Task.CompletedTask;
             }
     
-            if (value.Artifact is CopyFileArtifact copyFileArtifact)
+            if (finalizedResult.Artifact is CopyFileArtifact copyFileArtifact)
             {
                 var sourceRoot = Path.GetDirectoryName(copyFileArtifact.FilePath) ?? string.Empty;
     
@@ -51,7 +56,7 @@ namespace atinybirdDucting.Components
                     _files[sourceRoot].Add(copyFileArtifact.FilePath, copyFileArtifact.TargetFilePath);
                 }
             }
-            else if (value.Artifact is ThumbnailArtifact genThumbArtifact)
+            else if (finalizedResult.Artifact is ThumbnailArtifact genThumbArtifact)
             {
                 lock (_lock)
                 {
