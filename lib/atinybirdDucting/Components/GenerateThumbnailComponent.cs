@@ -5,6 +5,7 @@ using atinybirdDucting.Artifacts;
 using ductwork;
 using ductwork.Artifacts;
 using ductwork.Components;
+using ductwork.Executors;
 
 namespace atinybirdDucting.Components
 {
@@ -19,7 +20,7 @@ namespace atinybirdDucting.Components
             TargetRoot = targetRoot;
         }
         
-        protected override async Task ExecuteIn(Graph graph, IArtifact artifact, CancellationToken token)
+        protected override async Task ExecuteIn(GraphExecutor executor, IArtifact artifact, CancellationToken token)
         {
             if (artifact is not IFilePathArtifact filePathArtifact)
             {
@@ -33,7 +34,7 @@ namespace atinybirdDucting.Components
                 ".thumb",
                 Path.GetFileNameWithoutExtension(relativePath) + ".png");
             var thumbnailArtifact = new ThumbnailArtifact(filePathArtifact.FilePath, targetPath);
-            await graph.Push(Out, thumbnailArtifact);
+            await executor.Push(Out, thumbnailArtifact);
         }
     }
 }

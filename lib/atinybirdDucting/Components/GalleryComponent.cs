@@ -7,6 +7,7 @@ using atinybirdDucting.Artifacts;
 using ductwork;
 using ductwork.Artifacts;
 using ductwork.Components;
+using ductwork.Executors;
 
 #nullable enable
 namespace atinybirdDucting.Components
@@ -30,7 +31,7 @@ namespace atinybirdDucting.Components
             OutputName = outputName;
         }
     
-        protected override Task ExecuteIn(Graph graph, IArtifact artifact, CancellationToken token)
+        protected override Task ExecuteIn(GraphExecutor executor, IArtifact artifact, CancellationToken token)
         {
             if (artifact is not FinalizedResult finalizedResult)
             {
@@ -67,7 +68,7 @@ namespace atinybirdDucting.Components
             return Task.CompletedTask;
         }
     
-        protected override async Task ExecuteComplete(Graph graph, CancellationToken token)
+        protected override async Task ExecuteComplete(GraphExecutor executor, CancellationToken token)
         {
             foreach (var (sourceRoot, files) in _files)
             {
@@ -79,7 +80,7 @@ namespace atinybirdDucting.Components
                     .ToHashSet();
                 var targetFiles = files
                     .ToDictionary(pair => pair.Value, pair => _thumbnails.GetValueOrDefault(pair.Key));
-                await graph.Push(Out, new GalleryArtifact(
+                await executor.Push(Out, new GalleryArtifact(
                     SourceRoot,
                     TargetRoot,
                     TemplateName,
