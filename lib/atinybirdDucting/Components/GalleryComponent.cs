@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using atinybirdDucting.Artifacts;
-using ductwork;
 using ductwork.Artifacts;
 using ductwork.Components;
 using ductwork.Executors;
@@ -14,23 +13,15 @@ namespace atinybirdDucting.Components
 {
     public class GalleryComponent : SingleInSingleOutComponent
     {
+        public Setting<string> SourceRoot = new();
+        public Setting<string> TargetRoot = new();
+        public Setting<string> TemplateName = new(".index.tmpl");
+        public Setting<string> OutputName = new("index.html");
+        
         private readonly object _lock = new();
         private readonly Dictionary<string, Dictionary<string, string>> _files = new();
         private readonly Dictionary<string, string> _thumbnails = new();
-    
-        public string SourceRoot { get; }
-        public string TargetRoot { get; }
-        public string TemplateName { get; }
-        public string OutputName { get; }
-    
-        public GalleryComponent(string sourceRoot, string targetRoot, string templateName, string outputName)
-        {
-            SourceRoot = sourceRoot;
-            TargetRoot = targetRoot;
-            TemplateName = templateName;
-            OutputName = outputName;
-        }
-    
+
         protected override Task ExecuteIn(GraphExecutor executor, IArtifact artifact, CancellationToken token)
         {
             if (artifact is not FinalizedResult finalizedResult)

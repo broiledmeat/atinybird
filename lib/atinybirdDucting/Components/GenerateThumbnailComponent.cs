@@ -11,14 +11,8 @@ namespace atinybirdDucting.Components
 {
     public class GenerateThumbnailComponent : SingleInSingleOutComponent
     {
-        public string SourceRoot { get; }
-        public string TargetRoot { get; }
-    
-        public GenerateThumbnailComponent(string sourceRoot, string targetRoot)
-        {
-            SourceRoot = sourceRoot;
-            TargetRoot = targetRoot;
-        }
+        public Setting<string> SourceRoot = new();
+        public Setting<string> TargetRoot = new();
         
         protected override async Task ExecuteIn(GraphExecutor executor, IArtifact artifact, CancellationToken token)
         {

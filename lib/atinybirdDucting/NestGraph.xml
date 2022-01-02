@@ -11,15 +11,13 @@
 
     <!-- Path iteration for visible files under /nest/ -->
     <component key="PathIterator" type="DirectoryFilePathIteratorComponent">
-        <arg type="string">/home/derrick/projects/atinybird/source_nest</arg>
-        <arg type="bool">true</arg>
-        <arg type="bool">false</arg>
+        <set name="Path">/home/derrick/projects/atinybird/source_nest</set>
     </component>
     
     <!-- File copying -->
     <component key="FileCopy" type="CopyFilePathToTargetPathComponent">
-        <arg type="string">/home/derrick/projects/atinybird/source_nest</arg>
-        <arg type="string">/home/derrick/projects/atinybird/build/nest</arg>
+        <set name="SourceRoot">/home/derrick/projects/atinybird/source_nest</set>
+        <set name="TargetRoot">/home/derrick/projects/atinybird/build/nest</set>
     </component>
 
     <connection out="PathIterator.Out" in="FileCopy.In"/>
@@ -27,8 +25,8 @@
 
     <!-- Thumbnail generation -->
     <component key="GenerateThumb" type="GenerateThumbnailComponent">
-        <arg type="string">/home/derrick/projects/atinybird/source_nest</arg>
-        <arg type="string">/home/derrick/projects/atinybird/build/nest</arg>
+        <set name="SourceRoot">/home/derrick/projects/atinybird/source_nest</set>
+        <set name="TargetRoot">/home/derrick/projects/atinybird/build/nest</set>
     </component>
 
     <connection out="PathIterator.Out" in="GenerateThumb.In"/>
@@ -36,10 +34,8 @@
     
     <!-- Index generation -->
     <component key="Gallery" type="GalleryComponent">
-        <arg type="string">/home/derrick/projects/atinybird/source_nest</arg>
-        <arg type="string">/home/derrick/projects/atinybird/build/nest</arg>
-        <arg type="string">.index.tmpl</arg>
-        <arg type="string">index.html</arg>
+        <set name="SourceRoot">/home/derrick/projects/atinybird/source_nest</set>
+        <set name="TargetRoot">/home/derrick/projects/atinybird/build/nest</set>
     </component>
     <component key="GalleryFinalizer" type="FinalizeArtifactsComponent"/>
     

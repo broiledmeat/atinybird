@@ -11,12 +11,10 @@
 
     <!-- Path iteration for visible files under /nest/ -->
     <component key="PathIterator" type="DirectoryFilePathIteratorComponent">
-        <arg type="string">/home/derrick/projects/atinybird/source</arg>
-        <arg type="bool">true</arg>
-        <arg type="bool">false</arg>
+        <set name="Path">/home/derrick/projects/atinybird/source</set>
     </component>
     <component key="IsTemplatePath" type="FilePathGlobMatchComponent">
-        <arg type="string">**/*.html</arg>
+        <set name="Glob">**/*.html</set>
     </component>
 
     <connection out="PathIterator.Out" in="IsTemplatePath.In"/>
@@ -25,8 +23,8 @@
     <component key="TemplateParser" type="TemplateParserComponent"/>
     <component key="TemplateParserComplete" type="InputAwaiterComponent:IFilePathArtifact"/>
     <component key="TemplateRenderer" type="TemplateRendererComponent">
-        <arg type="string">/home/derrick/projects/atinybird/source</arg>
-        <arg type="string">/home/derrick/projects/atinybird/build</arg>
+        <set name="SourceRoot">/home/derrick/projects/atinybird/source</set>
+        <set name="TargetRoot">/home/derrick/projects/atinybird/build</set>
     </component>
 
     <connection out="IsTemplatePath.True" in="TemplateParser.In"/>
@@ -36,8 +34,8 @@
 
     <!-- File copying -->
     <component key="FileCopy" type="CopyFilePathToTargetPathComponent">
-        <arg type="string">/home/derrick/projects/atinybird/source</arg>
-        <arg type="string">/home/derrick/projects/atinybird/build</arg>
+        <set name="SourceRoot">/home/derrick/projects/atinybird/source</set>
+        <set name="TargetRoot">/home/derrick/projects/atinybird/build</set>
     </component>
 
     <connection out="IsTemplatePath.False" in="FileCopy.In"/>
