@@ -1,4 +1,6 @@
 {{
+ext_css = ["/css/index.css"]
+
 func filterUnpublished(vars)
     ret vars.published != false
 end
@@ -12,12 +14,9 @@ experiments = get_named_contexts "experiments.*"
 
 {{ capture content }}
 <section>
-    Hello my future girlfriend, my name is Derrick Staples. I enjoy playing with
-    code, climbing on things I should not, running, caster-boarding, and twirling
-    things around like a baton girl on a cheerleading squad.<br><br>
-    atinybird is mostly just an experiment and file dump; there is not much here
-    with fleshed out content. If anything seems remotely interesting however,
-    please feel free to <a href="/cheep.html">contact me</a>.
+    Oh hey, my name is Derrick Staples. I'm a software engineer at Blizzard Albany, in NY.<br><br>
+    atinybird is mostly just an experiment and file dump; there is not much here with fleshed out content. If anything
+    seems remotely interesting however, feel free to contact me at broiledmeat LOBSTER BERSERKER gmail.com.
 </section>
 
 <section>
@@ -27,10 +26,10 @@ experiments = get_named_contexts "experiments.*"
     </header>
     <ul>
         {{~ for vars in projects ~}}
-            <li>
-                <a href="{{ vars.url ?? vars._relPath }}">{{ vars.title }}</a><br>
-                {{ vars.description }}
-            </li>
+        <li>
+            <a href="{{ vars.url ?? vars._relPath }}">{{ vars.title }}</a><br>
+            {{ vars.description }}
+        </li>
         {{~ end ~}}
     </ul>
 </section>
@@ -50,28 +49,94 @@ experiments = get_named_contexts "experiments.*"
     </ul>
 </section>
 
-<section>
+<section id="games">
     <header>
         <img src="/img/icon-duck.png">
-        <a href="/nest/art/">Art</a>
+        Games
     </header>
     <ul>
-        <li>Random art produced in spurts.</li>
+        <li>Games I have worked on.</li>
     </ul>
+    <table>
+        <tr>
+            <td><a href="https://www.youtube.com/watch?v=QJZW2lcq6hA">Guitar Hero: iOS</a></td>
+            <td>2010</td>
+        </tr>
+        <tr>
+            <td><a href="https://www.youtube.com/watch?v=BWBEp9m-a7c">Skylanders: Cloud Patrol</a></td>
+            <td>2012</td>
+        </tr>
+        <tr>
+            <td><a href="https://www.youtube.com/watch?v=uBWFLvMvCew">Skylanders: Battlegrounds</a></td>
+            <td>2012</td>
+        </tr>
+        <tr>
+            <td><a href="https://en.wikipedia.org/wiki/Skylanders:_Swap_Force">Skylanders: Swap Force</a></td>
+            <td>2013</td>
+        </tr>
+        <tr>
+            <td><a href="https://en.wikipedia.org/wiki/Skylanders:_Trap_Team">Skylanders: Trap Team</a></td>
+            <td>2014</td>
+        </tr>
+        <tr>
+            <td><a href="https://en.wikipedia.org/wiki/Skylanders:_SuperChargers">Skylanders: SuperChargers</a></td>
+            <td>2015</td>
+        </tr>
+        <tr>
+            <td><a href="https://en.wikipedia.org/wiki/Skylanders:_Imaginators">Skylanders: Imaginators</a></td>
+            <td>2016</td>
+        </tr>
+        <tr>
+            <td>
+                <a href="https://en.wikipedia.org/wiki/Crash_Bandicoot_Remastered_Collection">
+                    Crash Bandicoot Remastered Collection
+                </a>
+            </td>
+            <td>2017</td>
+        </tr>
+        <tr>
+            <td><a href="https://www.destinythegame.com">Destiny 2</a></td>
+            <td>2017</td>
+        </tr>
+        <tr>
+            <td><a href="https://www.crashbandicoot.com/crashteamracing">Crash Team Racing Nitro-Fueled</a></td>
+            <td>2019</td>
+        </tr>
+        <tr>
+            <td><a href="https://diablo2.blizzard.com">Diablo II: Resurrected</a></td>
+            <td>2021</td>
+        </tr>
+        <tr>
+            <td><a href="https://overwatch.blizzard.com">Overwatch 2</a></td>
+            <td>2022</td>
+        </tr>
+    </table>
 </section>
 
 <section>
     <header>
         <img src="/img/icon-baby-bird.png">
-        <a href="/nest/">Nest</a>
+        Nest
     </header>
     <ul>
-        <li>File dump with pretty thumbnails.</li>
+        <li>
+            <a href="/nest/art/">Art</a><br>
+            Probably weird art produced in spurts.
+        </li>
+        <li>
+            <a href="/nest/photo/">Photos</a><br>
+            Images captured with an actual real camera.
+        </li>
+        <li>
+            <a href="/nest/">Everything</a><br>
+            Random file dump.
+        </li>
     </ul>
 </section>
 
 <footer>
-    powered by nginx, ductwork, and ennui. <a class="subdued" href="/cheep.html">cheep cheep</a>
+    powered by nginx, ductwork, and ennui.<br>
+    <a href="https://www.last.fm/user/broiledmeat"><img src="/img/lastfm_graph.svg"></a>
 </footer>
 {{ end }}
 
