@@ -22,7 +22,7 @@ namespace atinybirdDucting.Components
         private readonly Dictionary<string, Dictionary<string, string>> _files = new();
         private readonly Dictionary<string, string> _thumbnails = new();
 
-        protected override Task ExecuteIn(GraphExecutor executor, IArtifact artifact, CancellationToken token)
+        protected override Task ExecuteIn(IExecutor executor, IArtifact artifact, CancellationToken token)
         {
             if (artifact is not FinalizedResult finalizedResult)
             {
@@ -59,7 +59,7 @@ namespace atinybirdDucting.Components
             return Task.CompletedTask;
         }
     
-        protected override async Task ExecuteComplete(GraphExecutor executor, CancellationToken token)
+        protected override async Task ExecuteComplete(IExecutor executor, CancellationToken token)
         {
             foreach (var (sourceRoot, files) in _files)
             {

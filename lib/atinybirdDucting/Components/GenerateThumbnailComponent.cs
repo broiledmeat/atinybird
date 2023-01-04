@@ -14,7 +14,7 @@ namespace atinybirdDucting.Components
         public Setting<string> SourceRoot = new();
         public Setting<string> TargetRoot = new();
         
-        protected override async Task ExecuteIn(GraphExecutor executor, IArtifact artifact, CancellationToken token)
+        protected override async Task ExecuteIn(IExecutor executor, IArtifact artifact, CancellationToken token)
         {
             if (artifact is not IFilePathArtifact filePathArtifact)
             {
