@@ -1,21 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <graph>
     <lib path="./atinybirdDucting.dll"/>
-    
-    <config>
-        <logfile path="/home/derrick/projects/atinybird/store/nestBuild.log" />
-    </config>
-    
+    <lib path="./ductworkScriban.dll"/>
+    <logfile path="/home/derrick/projects/atinybird/store/nestBuild.log"/>
+
     <!-- Artifact processor -->
-    <component key="Finalizer" type="FinalizeArtifactsComponent"/>
+    <component name="Finalizer" type="FinalizeArtifactsComponent"/>
 
     <!-- Path iteration for visible files under /nest/ -->
-    <component key="PathIterator" type="DirectoryFilePathIteratorComponent">
+    <component name="PathIterator" type="DirectoryFilePathIteratorComponent">
         <set name="Path">/home/derrick/projects/atinybird/source_nest</set>
     </component>
-    
+
     <!-- File copying -->
-    <component key="FileCopy" type="CopyFilePathToTargetPathComponent">
+    <component name="FileCopy" type="CopyFilePathToTargetPathComponent">
         <set name="SourceRoot">/home/derrick/projects/atinybird/source_nest</set>
         <set name="TargetRoot">/home/derrick/projects/atinybird/build/nest</set>
     </component>
@@ -24,21 +22,21 @@
     <connection out="FileCopy.Out" in="Finalizer.In"/>
 
     <!-- Thumbnail generation -->
-    <component key="GenerateThumb" type="GenerateThumbnailComponent">
+    <component name="GenerateThumb" type="GenerateThumbnailComponent">
         <set name="SourceRoot">/home/derrick/projects/atinybird/source_nest</set>
         <set name="TargetRoot">/home/derrick/projects/atinybird/build/nest</set>
     </component>
 
     <connection out="PathIterator.Out" in="GenerateThumb.In"/>
     <connection out="GenerateThumb.Out" in="Finalizer.In"/>
-    
+
     <!-- Index generation -->
-    <component key="Gallery" type="GalleryComponent">
+    <component name="Gallery" type="GalleryComponent">
         <set name="SourceRoot">/home/derrick/projects/atinybird/source_nest</set>
         <set name="TargetRoot">/home/derrick/projects/atinybird/build/nest</set>
     </component>
-    <component key="GalleryFinalizer" type="FinalizeArtifactsComponent"/>
-    
+    <component name="GalleryFinalizer" type="FinalizeArtifactsComponent"/>
+
     <connection out="Finalizer.Out" in="Gallery.In"/>
     <connection out="Gallery.Out" in="GalleryFinalizer.In"/>
 </graph>

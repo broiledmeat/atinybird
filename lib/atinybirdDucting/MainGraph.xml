@@ -1,43 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <graph>
     <lib path="./ductworkScriban.dll"/>
-
-    <config>
-        <logfile path="/home/derrick/projects/atinybird/store/mainBuild.log"/>
-    </config>
-
+    <logfile path="/home/derrick/projects/atinybird/store/mainBuild.log"/>
     <!-- Artifact processor -->
-    <component key="Finalizer" type="FinalizeArtifactsComponent"/>
-
-    <!-- Path iteration for visible files under /nest/ -->
-    <component key="PathIterator" type="DirectoryFilePathIteratorComponent">
+    <component name="Finalizer" type="FinalizeArtifactsComponent" _guiPositionX="778" _guiPositionY="442"/>
+    <!-- Path iteration -->
+    <component name="PathIterator" type="DirectoryFilePathIteratorComponent" _guiPositionX="6" _guiPositionY="170">
         <set name="Path">/home/derrick/projects/atinybird/source</set>
     </component>
-    <component key="IsTemplatePath" type="FilePathGlobMatchComponent">
+    <component name="IsTemplatePath" type="FilePathGlobMatchComponent" _guiPositionX="226" _guiPositionY="170">
         <set name="Glob">**/*.html</set>
     </component>
-
     <connection out="PathIterator.Out" in="IsTemplatePath.In"/>
-
     <!-- HTML Templating -->
-    <component key="TemplateParser" type="TemplateParserComponent"/>
-    <component key="TemplateParserComplete" type="InputAwaiterComponent:IFilePathArtifact"/>
-    <component key="TemplateRenderer" type="TemplateRendererComponent">
+    <component name="TemplateParser" type="TemplateParserComponent" _guiPositionX="454" _guiPositionY="103"/>
+    <component name="TemplateParserComplete" type="InputAwaiterComponent:IFilePathArtifact" _guiPositionX="672"
+               _guiPositionY="104"/>
+    <component name="TemplateRenderer" type="TemplateRendererComponent" _guiPositionX="885" _guiPositionY="106">
         <set name="SourceRoot">/home/derrick/projects/atinybird/source</set>
         <set name="TargetRoot">/home/derrick/projects/atinybird/build</set>
     </component>
-
     <connection out="IsTemplatePath.True" in="TemplateParser.In"/>
     <connection out="TemplateParser.Out" in="TemplateParserComplete.In"/>
     <connection out="TemplateParserComplete.Out" in="TemplateRenderer.In"/>
     <connection out="TemplateRenderer.Out" in="Finalizer.In"/>
-
     <!-- File copying -->
-    <component key="FileCopy" type="CopyFilePathToTargetPathComponent">
+    <component name="FileCopy" type="CopyFilePathToTargetPathComponent" _guiPositionX="458" _guiPositionY="248">
         <set name="SourceRoot">/home/derrick/projects/atinybird/source</set>
         <set name="TargetRoot">/home/derrick/projects/atinybird/build</set>
     </component>
-
     <connection out="IsTemplatePath.False" in="FileCopy.In"/>
     <connection out="FileCopy.Out" in="Finalizer.In"/>
 </graph>
