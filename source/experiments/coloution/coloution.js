@@ -1,167 +1,278 @@
 'use strict';
-var // Cell options
-      width = 500
-    , mutation_degree = 0.1
 
-    // Display options
-    , height = 250
-    , wait = 10
+const WIDTH = 800;
+const HEIGHT = 600;
 
-    // globals
-    , cvs = null
-    , ctx = null
-    , timer = null
-    , cells_a = new Uint32Array(width)
-    , cells_b = new Uint32Array(width)
-    , cells_cur = cells_a
-    , cells_old = cells_b
-    , parents = new Uint32Array(3)
-    , mutation_hi = (256 * mutation_degree)|0
-    , mutation_low = -1 * (mutation_hi / 2)|0
-    , draw_id = null
-    , draw = null;
+class ImageDataRow
+{
+    /**
+     * @param {CanvasRenderingContext2D} context
+     */
+    constructor(context)
+    {
+        this._image_data = context.createImageData(context.canvas.width, 1);
+        this._buffer = new ArrayBuffer(this._image_data.data.length);
+        this._buffer8 = new Uint8ClampedArray(this._buffer);
+        this._buffer32 = new Uint32Array(this._buffer);
+    }
+
+    /**
+     * @returns {Uint32Array}
+     */
+    get buffer()
+    {
+        return this._buffer32;
+    }
+
+    /**
+     * @param {CanvasRenderingContext2D} context
+     * @param {Number} x
+     * @param {Number} y
+     */
+    draw(context, x, y)
+    {
+        this._image_data.data.set(this._buffer8);
+        context.putImageData(this._image_data, x, y);
+    }
+}
+
+class Coloution
+{
+    /**
+     * @param {Number} width
+     * @param {Number} height
+     */
+    constructor(width, height)
+    {
+        const mutation_degree = 0.1;
+        this._mutation_hi = (256 * mutation_degree) | 0;
+        this._mutation_low = -1 * (this._mutation_hi / 2) | 0;
+
+        this._canvas = document.createElement("canvas");
+        this._canvas.width = width;
+        this._canvas.height = height;
+        this._context = this._canvas.getContext("2d");
+        this._cells_current = new ImageDataRow(this._context);
+        this._cells_previous = new ImageDataRow(this._context);
+        this._parents = new Uint32Array(3);
+
+        this._attached_canvases = {};
+
+        this._last_iterate_time = 0;
+        this._draw_func = this._draw;
+
+        this.randomize();
+    }
+
+    /**
+     * @returns {number}
+     */
+    get _width()
+    {
+        return this._canvas.width;
+    }
+
+    /**
+     * @returns {number}
+     */
+    get _height()
+    {
+        return this._canvas.height;
+    }
+
+    start()
+    {
+        requestAnimationFrame(t => this._draw_func(t));
+    }
+
+    randomize()
+    {
+        const current = this._cells_current.buffer;
+        const previous = this._cells_previous.buffer;
+        for (let i = 0; i < this._width; i++)
+        {
+            current[i] = previous[i] = (Math.random() * 256 * 256 * 256) | 0;
+        }
+    }
+
+    /**
+     * @param {HTMLCanvasElement} element
+     */
+    attach_canvas(element)
+    {
+        this._attached_canvases[element] = element.getContext("2d");
+    }
+
+    toggle_history()
+    {
+        this._draw_func = this._draw_func === this._draw
+            ? this._draw_no_history
+            : this._draw;
+    }
+
+    _push_to_attached_canvases()
+    {
+        for (const canvas in this._attached_canvases)
+        {
+            const context = this._attached_canvases[canvas];
+            context.drawImage(this._canvas, 0, 0, this._width, this._height);
+        }
+    }
+
+    _draw(time)
+    {
+        requestAnimationFrame(t => this._draw_func(t));
+
+        const steps = this._get_steps(time);
+
+        if (steps === 0)
+        {
+            return;
+        }
+
+        const context = this._context;
+        const width = this._width;
+        const height = this._height;
+        const clip_height = this._height - steps;
+
+        this._context.drawImage(
+            this._canvas,
+            0, steps, width, clip_height,
+            0, 0, width, clip_height);
+
+        for (let step = 0; step < steps; step++)
+        {
+            this._iterate();
+            this._cells_current.draw(context, 0, height - (steps - step));
+        }
+
+        this._push_to_attached_canvases();
+    }
+
+    _draw_no_history(time)
+    {
+        requestAnimationFrame(t => this._draw_func(t));
+
+        const steps = this._get_steps(time);
+
+        if (steps === 0)
+        {
+            return;
+        }
+
+        for (let _ = 0; _ < steps; _++)
+        {
+            this._iterate();
+        }
+
+        const context = this._context;
+        const height = this._height;
+        const current = this._cells_current;
+        for (let y = 0; y < height; y++)
+        {
+            current.draw(context, 0, y);
+        }
+
+        this._push_to_attached_canvases()
+    }
+
+    /**
+     * @returns {number}
+     */
+    _get_steps(time)
+    {
+        const deltaTime = time - this._last_iterate_time;
+        const steps = Math.floor(deltaTime / 3);
+
+        if (steps > 0)
+        {
+            this._last_iterate_time = time;
+        }
+
+        return Math.min(steps, 32);
+    }
+
+    _iterate()
+    {
+        const width = this._width;
+        const mutation_hi = this._mutation_hi;
+        const mutation_low = this._mutation_low;
+        const parents = this._parents;
+        const current = this._cells_current.buffer;
+        const previous = this._cells_previous.buffer;
+
+        for (let i = 0; i < width; i++)
+        {
+            parents[0] = previous[i];
+            if (i === 0)
+            {
+                parents[1] = previous[width - 1];
+                parents[2] = previous[i + 1];
+            }
+            else if (i === width - 1)
+            {
+                parents[1] = previous[i - 1];
+                parents[2] = previous[0];
+            }
+            else
+            {
+                parents[1] = previous[i - 1];
+                parents[2] = previous[i + 1];
+            }
+
+            // Randomize parents
+            let r = (Math.random() * 3) | 0;
+            let t = parents[r];
+            parents[r] = parents[2];
+            parents[2] = t;
+
+            r = (Math.random() * 3) | 0;
+            t = parents[r];
+            parents[r] = parents[1];
+            parents[1] = t;
+
+            // Get a color segment from each parent
+            let color = (parents[0] & 0xff0000) | (parents[1] & 0x00ff00) | (parents[2] & 0x0000ff);
+
+            // Mutate a random color segment
+            let j = (Math.random() * 3) | 0;
+            t = ((color & (0xff << (j * 8))) >> (j * 8)) + ((Math.random() * mutation_hi) + mutation_low) | 0;
+            t = Math.max(0, Math.min(255, t));
+
+            // Mask out the old color segment, and insert the new one
+            color = (0xff << 24) | (color & (0xffffff ^ (0xff << (j * 8)))) | (t << (j * 8));
+
+            current[i] = color;
+        }
+
+        let swap = this._cells_previous;
+        this._cells_previous = this._cells_current;
+        this._cells_current = swap;
+    }
+}
 
 window.onload = function()
 {
-    var   randomize_button = document.getElementById('randomize')
-        , toggle_history_button = document.getElementById('toggle_history');
+    const canvas = document.getElementById("cvs");
+    canvas.width = WIDTH;
+    canvas.height = HEIGHT;
+    canvas.imageSmoothingEnabled = false;
 
-    cvs = document.getElementById('cvs');
-    cvs.width = width;
-    cvs.height = height;
-    ctx = cvs.getContext('2d');
+    const coloution = new Coloution(WIDTH, HEIGHT);
+    coloution.attach_canvas(canvas);
+    coloution.start();
 
-    randomize_button.onclick = function()
+    const randomize_button = document.getElementById("randomize");
+    const toggle_history_button = document.getElementById("toggle_history");
+
+    randomize_button.onclick = () =>
     {
-        init();
+        coloution.randomize();
         return false;
     };
-    toggle_history_button.onclick = function()
+    toggle_history_button.onclick = () =>
     {
-        if (draw === drawWithHistory)
-        {
-            toggle_history_button.value = 'show history';
-            draw = drawLarge;
-        }
-        else
-        {
-            toggle_history_button.value = 'hide history';
-            draw = drawWithHistory;
-        }
+        coloution.toggle_history();
         return false;
     };
-
-    draw = drawWithHistory;
-    init();
 };
-
-function init()
-{
-    clearTimeout(timer);
-    randomize();
-    draw();
-    timer = setInterval(iterate, wait);
-}
-
-function iterate()
-{
-    var   i, j
-        , r, t
-        , color;
-
-    for (i = 0; i < width; i++)
-    {
-        parents[0] = cells_old[i];
-        if (i === 0)
-        {
-            parents[1] = cells_old[width - 1];
-            parents[2] = cells_old[i + 1];
-        }
-        else if (i === width - 1)
-        {
-            parents[1] = cells_old[i - 1];
-            parents[2] = cells_old[0];
-        }
-        else
-        {
-            parents[1] = cells_old[i - 1];
-            parents[2] = cells_old[i + 1];
-        }
-
-        // Randomize parents
-        r = (Math.random() * 3)|0;
-        t = parents[r];
-        parents[r] = parents[2];
-        parents[2] = t;
-
-        r = (Math.random() * 3)|0;
-        t = parents[r];
-        parents[r] = parents[1];
-        parents[1] = t;
-
-        // Get a color segment from each parent
-        color = (parents[0] & 0xff0000) | (parents[1] & 0x00ff00) | (parents[2] & 0x0000ff);
-
-        // Mutate a random color segment
-        j = (Math.random() * 3)|0;
-        t = ((color & (0xff << (j * 8))) >> (j * 8)) + ((Math.random() * mutation_hi) + mutation_low)|0;
-        if (t < 0) { t = 0; }
-        else if (t > 255) { t = 255; }
-
-        // Mask out the old color segment, and insert the new one
-        color = (color & (0xffffff ^ (0xff << (j * 8)))) | (t << (j * 8));
-
-        cells_cur[i] = color;
-    }
-
-    if (draw_id === null)
-    {
-        draw_id = requestAnimationFrame(draw);
-    }
-
-    t = cells_old;
-    cells_old = cells_cur;
-    cells_cur = t;
-}
-
-function randomize()
-{
-    var i;
-
-    for (i = 0; i < width; i++)
-    {
-        cells_cur[i] = cells_old[i] = (Math.random() * 256 * 256 * 256)|0;
-    }
-}
-
-function drawWithHistory()
-{
-    var   i
-        , cell;
-
-    ctx.drawImage(cvs, 0, 1, width, height - 1,
-        0, 0, width, height - 1);
-    for (i = 0; i < width; i++)
-    {
-        cell = cells_cur[i];
-        ctx.fillStyle = '#' + (('000000' + cell.toString(16)).slice(-6));
-        ctx.fillRect(i, height - 1, 1, 1);
-    }
-
-    draw_id = null;
-}
-
-function drawLarge()
-{
-    var   i
-        , cell;
-
-    for (i = 0; i < width; i++)
-    {
-        cell = cells_cur[i];
-        ctx.fillStyle = '#' + (('000000' + cell.toString(16)).slice(-6));
-        ctx.fillRect(i, 0, 1, height);
-    }
-
-    draw_id = null;
-}
