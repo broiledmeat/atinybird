@@ -9,6 +9,9 @@
         {{- for file in ext_js ~}}
             <script type="text/javascript" src="{{ file }}"></script>
         {{- end ~}}
+        {{- for file in ext_js_module ~}}
+        <script type="module" src="{{ file }}"></script>
+        {{- end ~}}
     </head>
     <body>
         {{ body_content }}
