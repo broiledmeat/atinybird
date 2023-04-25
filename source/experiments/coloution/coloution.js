@@ -15,10 +15,17 @@ class Coloution extends blCanvas
 
         // Previously, these did some math to end up with 25, -12. Manually set these for clarity, with a slightly
         // lower high value as to not allow long term mutation to skew too bright.
+<<<<<<< HEAD
         this._mutationHigh = 24.75;
         this._mutationLow = -12;
 
         this._cellsCurrent = this.createBuffer(width, 1);
+=======
+        this._mutation_high = 24.75;
+        this._mutation_low = -12;
+
+        this._cells_current = this.createBuffer(width, 1);
+>>>>>>> marceline/master
         this._cells_previous = this.createBuffer(width, 1);
         this._parents = new Uint32Array(3);
 
@@ -127,8 +134,13 @@ class Coloution extends blCanvas
     _iterate()
     {
         const width = this._width;
+<<<<<<< HEAD
         const mutation_high = this._mutationHigh;
         const mutation_low = this._mutationLow;
+=======
+        const mutation_high = this._mutation_high;
+        const mutation_low = this._mutation_low;
+>>>>>>> marceline/master
         const parents = this._parents;
         const current = this._cellsCurrent.buffer;
         const previous = this._cells_previous.buffer;
