@@ -1,4 +1,4 @@
-import {blCanvas} from "/js/birdlib.mjs";
+import {blCanvas} from "/js/birdlib/canvas.mjs";
 
 const WIDTH = 800;
 const HEIGHT = 600;
