@@ -15,18 +15,11 @@ class Coloution extends blCanvas
 
         // Previously, these did some math to end up with 25, -12. Manually set these for clarity, with a slightly
         // lower high value as to not allow long term mutation to skew too bright.
-<<<<<<< HEAD
         this._mutationHigh = 24.75;
         this._mutationLow = -12;
 
         this._cellsCurrent = this.createBuffer(width, 1);
-=======
-        this._mutation_high = 24.75;
-        this._mutation_low = -12;
-
-        this._cells_current = this.createBuffer(width, 1);
->>>>>>> marceline/master
-        this._cells_previous = this.createBuffer(width, 1);
+        this._cellsPrevious = this.createBuffer(width, 1);
         this._parents = new Uint32Array(3);
 
         this._lastIterateTime = 0;
@@ -43,7 +36,7 @@ class Coloution extends blCanvas
     randomize()
     {
         const current = this._cellsCurrent.buffer;
-        const previous = this._cells_previous.buffer;
+        const previous = this._cellsPrevious.buffer;
         for (let i = 0; i < this._width; i++)
         {
             current[i] = previous[i] = (Math.random() * 256 * 256 * 256) | 0;
@@ -134,16 +127,11 @@ class Coloution extends blCanvas
     _iterate()
     {
         const width = this._width;
-<<<<<<< HEAD
-        const mutation_high = this._mutationHigh;
-        const mutation_low = this._mutationLow;
-=======
-        const mutation_high = this._mutation_high;
-        const mutation_low = this._mutation_low;
->>>>>>> marceline/master
+        const mutationHigh = this._mutationHigh;
+        const mutationLow = this._mutationLow;
         const parents = this._parents;
         const current = this._cellsCurrent.buffer;
-        const previous = this._cells_previous.buffer;
+        const previous = this._cellsPrevious.buffer;
         const alpha = 0xff000000;
         let r = 0;
         let t = 0;
@@ -184,7 +172,7 @@ class Coloution extends blCanvas
 
             // Mutate a random color segment
             r = ((Math.random() * 3) | 0) * 8;
-            t = ((color & (0xff << r)) >> r) + ((Math.random() * mutation_high) + mutation_low);
+            t = ((color & (0xff << r)) >> r) + ((Math.random() * mutationHigh) + mutationLow);
             t = Math.max(0, Math.min(255, t)) | 0;
 
             // Mask out the old color segment, and insert the new one
@@ -193,8 +181,8 @@ class Coloution extends blCanvas
             current[i] = color;
         }
 
-        let swap = this._cells_previous;
-        this._cells_previous = this._cellsCurrent;
+        let swap = this._cellsPrevious;
+        this._cellsPrevious = this._cellsCurrent;
         this._cellsCurrent = swap;
     }
 }
