@@ -187,7 +187,7 @@ class Coloution extends blCanvas
     }
 }
 
-window.onload = function()
+window.onload = () =>
 {
     const canvas = document.getElementById("cvs");
     canvas.width = WIDTH;
