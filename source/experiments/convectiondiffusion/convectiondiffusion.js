@@ -1,302 +1,316 @@
-'use strict';
-var // Cell options
-      width = 40
-    , height = 40
-    , change_u = 0.1
-    , vector_strength = 0.35
+import {blCanvas} from "/js/birdlib/canvas.mjs";
+import {PALETTES} from "/js/birdlib/color.mjs";
 
-    // Display options
-    , color_sets =
-        [
-            ['adrift in dreams', [[11,72,107], [59,134,134], [121,189,154], [168,219,168], [207,240,158]]],
-            ['hanger management', [[184,42,102], [184,195,178], [241,227,193], [221,206,189], [76,90,95]]],
-            ['war', [[35,15,43], [242,29,85], [235,235,188], [188,227,197], [130,179,174]]],
-            ['rgbw', [[0,0,255], [0,255,0], [255,0,0], [255,255,255]]],
-            ['white-black', [[0,0,0], [255,255,255]]],
-            ['barf', [[0,255,255], [255,0,255], [0,255,255], [255,0,255], [0,255,255], [255,0,255], [0,255,255], [255,0,255], [0,255,255], [255,0,255]]]
-        ]
-    , color_set = color_sets[0][1]
-    , draw_scale = 8
-    , delay = 10
+const WIDTH = 300;
+const HEIGHT = 300;
 
-    // globals
-    , cvs = null
-    , ctx = null
-    , img = null
-    , draw_id = null
-    , timer = null
-    , u_data = []
-    , v_data = []
-    , u_gen = []
-    , high_u = 0
-    , low_u = 0
-    , noise2d = new SimplexNoise.SimplexNoise2D()
-    , draw_func
-
-    // constants
-    , TWO_PI = Math.PI * 2;
-
-window.onload = function()
+class ConvectionDiffusion extends blCanvas
 {
-    var   i
-        , width_input = document.getElementById('width')
-        , height_input = document.getElementById('height')
-        , scale_input = document.getElementById('scale')
-        , delay_input = document.getElementById('delay')
-        , change_u_input = document.getElementById('cu')
-        , strength_input = document.getElementById('strength')
-        , palette_input = document.getElementById('palette')
-        , settings_form = document.getElementById('settings');
-
-    cvs = document.getElementById('cvs');
-    ctx = cvs.getContext('2d');
-
-    width_input.value = width;
-    height_input.value = height;
-    scale_input.value = draw_scale;
-    delay_input.value = delay;
-    change_u_input.value = change_u;
-    strength_input.value = vector_strength;
-    palette_input.innerHTML = '';
-    
-    for (i = 0; i < color_sets.length; i++)
+    /**
+     * @param {Number} width
+     * @param {Number} height
+     */
+    constructor(width, height)
     {
-        palette_input.innerHTML += '<option value="' + i + '">' + color_sets[i][0] + '</option>';
+        super(width, height);
+
+        this._uChange = 0.1;
+        this._vectorStrength = 0.35;
+
+        const length = width * height;
+        this._uHigh = 0;
+        this._uLow = 0;
+        this._uCurrent = new Float32Array(length);
+        this._uPrevious = new Float32Array(length);
+        this._vCurrent = new Float32Array(length);
+
+        this._palette = PALETTES[Object.keys(PALETTES)[0]];
+
+        this._noise = new SimplexNoise.SimplexNoise2D();
+        this._imageBuffer = this.createBuffer(width, height);
+
+        this._lastIterateTime = 0;
+
+        this.randomize();
     }
 
-    palette_input.onchange = function()
+    /**
+     * @param {Number[]} value
+     */
+    set palette(value)
     {
-        color_set = color_sets[parseInt(palette_input.value, 10)][1];
+        this._palette = value;
+    }
+
+    /**
+     * @returns {Number}
+     */
+    get uChange()
+    {
+        return this._uChange;
+    }
+
+    /**
+     * @param {Number} value
+     */
+    set uChange(value)
+    {
+        this._uChange = value;
+    }
+
+    /**
+     * @returns {Number}
+     */
+    get vectorStrength()
+    {
+        return this._vectorStrength;
+    }
+
+    /**
+     * @param {Number} value
+     */
+    set vectorStrength(value)
+    {
+        this._vectorStrength = value;
+    }
+
+    start()
+    {
+        requestAnimationFrame(t => this._draw(t));
+    }
+
+    randomize()
+    {
+        const uCurrent = this._uCurrent;
+        const uPrevious = this._uPrevious;
+        const vCurrent = this._vCurrent;
+
+        this._uHigh = 0;
+        this._uLow = 1;
+
+        this._noise.randomizePermutations();
+
+        for (let y = 0; y < this._height; y++)
+        {
+            for (let x = 0; x < this._width; x++)
+            {
+                let u = Math.random();
+                this._uHigh = Math.max(u, this._uHigh);
+                this._uLow = Math.min(u, this._uLow);
+                this._setCell(uCurrent, x, y, u);
+                this._setCell(uPrevious, x, y, u);
+
+                let v = this._noise.noise(x / this._width, y / this._height) * Math.PI * 2;
+                this._setCell(vCurrent, x, y, v);
+            }
+        }
+    }
+
+    /**
+     * @param {Number} value
+     * @returns {Number}
+     * @private
+     */
+    _getColor(value)
+    {
+        let i = value * (this._palette.length - 1);
+        let j = i - (i | 0);
+
+        let ca = this._palette[(i + 1) | 0];
+        let cb = this._palette[i | 0];
+
+        if (cb === undefined) {
+            // console.log(`bad color! ${i} ${i | 0}`)
+            return 0xffff00ff;
+        }
+
+        if (ca === undefined)
+        {
+            return cb;
+        }
+
+        return (0xff << 24) |
+            ((((j * ca[0]) + ((1 - j) * cb[0])) | 0) << 16) |
+            ((((j * ca[1]) + ((1 - j) * cb[1])) | 0) << 8) |
+            (((j * ca[2]) + ((1 - j) * cb[2])) | 0);
+    }
+
+    _draw(time)
+    {
+        requestAnimationFrame(t => this._draw(t));
+
+        const steps = this._getSteps(time);
+
+        if (steps === 0)
+        {
+            return;
+        }
+
+        for (let _ = 0; _ < steps; _++)
+        {
+            this._iterate();
+        }
+
+        const buffer = this._imageBuffer.buffer;
+        const width = this._width;
+        const height = this._height;
+        const uCurrent = this._uCurrent;
+
+        for (let y = 0; y < height; y++)
+        {
+            for (let x = 0; x < width; x++)
+            {
+                // let cell = this._getCell(uCurrent, x, y);
+                let cell = this._getCell(uCurrent, x, y);
+                buffer[(y * width) + x] = this._getColor(cell);
+            }
+        }
+
+        this._imageBuffer.draw(this._context, 0, 0);
+        this.pushToAttachedCanvases();
+    }
+
+    _wrapWidth(x)
+    {
+        return ((x % this._width) + this._width) % this._width;
+    }
+
+    _wrapHeight(y)
+    {
+        return ((y % this._height) + this._height) % this._height;
+    }
+
+    /**
+     * @param {Float32Array} data
+     * @param {Number} x
+     * @param {Number} y
+     * @param {Number} value
+     * @private
+     */
+    _setCell(data, x, y, value)
+    {
+        x = this._wrapWidth(x);
+        y = this._wrapHeight(y);
+        data[(y * this._width) + x] = value;
+    }
+
+    /**
+     * @param {Float32Array} data
+     * @param {Number} x
+     * @param {Number} y
+     * @returns {Number}
+     * @private
+     */
+    _getCell(data, x, y)
+    {
+        x = this._wrapWidth(x);
+        y = this._wrapHeight(y);
+        return data[(y * this._width) + x];
+    }
+
+    /**
+     * @returns {number}
+     */
+    _getSteps(time)
+    {
+        const deltaTime = time - this._lastIterateTime;
+        const steps = Math.floor(deltaTime / 20);
+
+        if (steps > 0)
+        {
+            this._lastIterateTime = time;
+        }
+
+        return Math.min(steps, 32);
+    }
+
+    _iterate()
+    {
+        const width = this._width;
+        const height = this._height;
+        const uCurrent = this._uCurrent;
+        const uPrevious = this._uPrevious;
+        const vCurrent = this._vCurrent;
+        const uChange = this._uChange;
+        const vectorStrength = this._vectorStrength;
+        const uLowOriginal = this._uLow;
+        const uDiffOriginal = this._uHigh - this._uLow;
+
+        let uHigh = 0;
+        let uLow = 1;
+
+        let u, v, ul, ur, uu, ud, dux, duy, lu, vx, vy, nu;
+
+        for (let y = 0; y < height; y++)
+        {
+            for (let x = 0; x < width; x++)
+            {
+                u = this._getCell(uPrevious, x, y);
+                v = this._getCell(vCurrent, x, y);
+                ul = this._getCell(uPrevious, x - 1, y);
+                ur = this._getCell(uPrevious, x + 1, y);
+                uu = this._getCell(uPrevious, x, y - 1);
+                ud = this._getCell(uPrevious, x, y + 1);
+                dux = (ur - ul) / 2;
+                duy = (ud - uu) / 2;
+                lu = (u * -4) + ur + ul + uu + ud;
+                vx = Math.cos(v) * vectorStrength;
+                vy = Math.sin(v) * vectorStrength;
+                nu = u + ((uChange * lu) + ((vx * dux) + (vy * duy)));
+
+                // Scale nu so high_u and low_u never converge and implode
+                nu = (nu - uLowOriginal) / uDiffOriginal;
+                this._setCell(uCurrent, x, y, nu);
+
+                uHigh = Math.max(uHigh, nu);
+                uLow = Math.min(uLow, nu);
+            }
+        }
+
+        this._uHigh = uHigh;
+        this._uLow = uLow;
+
+        const swap = this._uPrevious;
+        this._uPrevious = this._uCurrent;
+        this._uCurrent = swap;
+
+    }
+}
+
+
+window.onload = () =>
+{
+    const canvas = document.getElementById("cvs");
+    canvas.width = WIDTH * 1.5;
+    canvas.height = HEIGHT * 1.5;
+    canvas.imageSmoothingEnabled = false;
+
+    const convectionDiffusion = new ConvectionDiffusion(WIDTH, HEIGHT);
+    convectionDiffusion.attachCanvas(canvas);
+    convectionDiffusion.start();
+
+    let settingsForm = document.getElementById("settings");
+    let uChangeInput = document.getElementById("cu");
+    let vectorStrengthInput = document.getElementById("strength");
+    let paletteInput = document.getElementById("palette")
+
+    uChangeInput.value = convectionDiffusion.uChange;
+    vectorStrengthInput.value = convectionDiffusion.vectorStrength;
+    for (const name of Object.keys(PALETTES))
+    {
+        paletteInput.innerHTML += `<option value="${name}">${name}</option>`;
+    }
+
+    paletteInput.onchange = function()
+    {
+        convectionDiffusion.palette = PALETTES[paletteInput.value];
     };
 
-    settings_form.onsubmit = function()
+    settingsForm.onsubmit = () =>
     {
-        width = parseInt(width_input.value, 10);
-        height = parseInt(height_input.value, 10);
-        draw_scale = parseInt(scale_input.value ,10);
-        delay = parseInt(delay_input.value, 10);
-        change_u = parseFloat(change_u_input.value);
-        vector_strength = parseFloat(strength_input.value);
-        color_set = color_sets[parseInt(palette_input.value, 10)][1];
-        init();
+        convectionDiffusion.uChange = parseFloat(uChangeInput.value);
+        convectionDiffusion.vectorStrength = parseFloat(vectorStrengthInput.value);
+        convectionDiffusion.randomize();
         return false;
-    };
-
-    init();
+    }
 };
-
-function init()
-{
-    var i;
-
-    clearTimeout(timer);
-
-    cvs.width = width * draw_scale;
-    cvs.height = height * draw_scale;
-    img = ctx.createImageData(cvs.width, cvs.height);
-
-    for (i = 0; i < (img.width * img.height * 4) + 3; i++)
-    {
-        img.data[i] = 255;
-    }
-    
-    if (draw_scale == 1)
-    {
-        draw_func = drawImg;
-    }
-    else
-    {
-        draw_func = drawImgScaled;
-    }
-
-    noise2d.randomizePermutations();
-    randomizeDataMaps();
-    timer = setInterval(iterate, delay);
-}
-
-function iterate()
-{
-    var   x, y
-        , u, v
-        , dux, duy
-        , lu
-        , vx, vy
-        , nu
-        , uu, ud, ul, ur
-        , orig_low_u, orig_diff_u;
-
-    orig_low_u = low_u;
-    orig_diff_u = high_u - low_u;
-
-    low_u = 1;
-    high_u = 0;
-
-    for (y = 0; y < height; y++)
-    {
-        for (x = 0; x < width; x++)
-        {
-            u = getCell(u_data, x, y);
-            v = getCell(v_data, x, y);
-            ul = getCell(u_data, x - 1, y);
-            ur = getCell(u_data, x + 1, y);
-            uu = getCell(u_data, x, y - 1);
-            ud = getCell(u_data, x, y + 1);
-            dux = (ur - ul) / 2;
-            duy = (ud - uu) / 2;
-            lu = (u * -4) + ur + ul + uu + ud;
-            vx = Math.cos(v) * vector_strength;
-            vy = Math.sin(v) * vector_strength;
-            nu = u + ((change_u * lu) + ((vx * dux) + (vy * duy)));
-
-            // Scale nu so high_u and low_u never converge and implode
-            nu = (nu - orig_low_u) / orig_diff_u;
-
-            if (nu > high_u)
-            {
-                high_u = nu;
-            }
-            if (nu < low_u)
-            {
-                low_u = nu;
-            }
-
-            setCell(u_gen, x, y, nu);
-        }
-    }
-
-    u_data = u_gen.slice();
-
-    if (draw_id === null)
-    {
-        draw_id = requestAnimationFrame(draw_func);
-    }
-}
-
-function drawImg()
-{
-    var   x, y
-        , i, c;
-  
-    for (y = 0; y < height; y++)
-    {
-        for (x = 0; x < width; x++)
-        {
-            c = getColor(getCell(u_data, x, y));
-            i = ((y * width * draw_scale * draw_scale) + (x * draw_scale)) * 4;
-            img.data[i    ] = c[0];
-            img.data[i + 1] = c[1];
-            img.data[i + 2] = c[2];
-        }
-    }
-
-    ctx.putImageData(img, 0, 0);
-    draw_id = null;
-}
-
-function drawImgScaled()
-{
-    var   x, y
-        , u, v
-        , i, iy, ix, c;
-  
-    for (y = 0; y < height; y++)
-    {
-        for (x = 0; x < width; x++)
-        {
-            c = getColor(getCell(u_data, x, y));
-
-            i = (y * width * draw_scale * draw_scale) + (x * draw_scale);
-            for (v = 0; v < draw_scale; v++)
-            {
-                iy = i + (v * width * draw_scale);
-                for (u = 0; u < draw_scale; u++)
-                {
-                    ix = (iy + u) * 4;
-                    img.data[ix    ] = c[0];
-                    img.data[ix + 1] = c[1];
-                    img.data[ix + 2] = c[2];
-                }
-            }
-        }
-    }
-
-    ctx.putImageData(img, 0, 0);
-    draw_id = null;
-}
-
-function emptyDataMap()
-{
-    var   i
-        , data = [];
-
-    for (i = 0; i < width * height; i++)
-    {
-        data.push(0);
-    }
-
-    return data;
-}
-
-function randomizeDataMaps()
-{
-    var   x, y
-        , u;
-
-    u_data = emptyDataMap();
-    v_data = emptyDataMap();
-    u_gen = emptyDataMap();
-    high_u = 1;
-    low_u = 0;
-
-    for (y = 0; y < height; y++)
-    {
-        for (x = 0; x < width; x++)
-        {
-            u = Math.random();
-            setCell(u_data, x, y, u);
-            setCell(v_data, x, y, noise2d.noise(x / width, y / height) * TWO_PI);
-
-            if (u > high_u)
-            {
-                high_u = u;
-            }
-            if (u < low_u)
-            {
-                low_u = u;
-            }
-        }
-    }
-}
-
-function getCell(data, x, y)
-{
-    if (x === -1) { x = width - 1; } else if (x === width) { x = 0; }
-    if (y === -1) { y = height - 1; } else if (y === height) { y = 0; }
-    return data[(y * width) + x];
-}
-
-function setCell(data, x, y, val)
-{
-    if (x === -1) { x = width - 1; } else if (x === width) { x = 0; }
-    if (y === -1) { y = height - 1; } else if (y === height) { y = 0; }
-    data[(y * width) + x] = val;
-}
-
-function getColor(val)
-{
-    var   i, j
-        , ca, cb
-        , r, g, b;
-
-    i = val * (color_set.length - 1);
-    j = i - (i|0);
-    
-    ca = color_set[(i + 1)|0];
-    cb = color_set[i|0];
-    if (ca === undefined) { return cb; }
-
-    r = ((j * ca[0]) + ((1 - j) * cb[0]))|0;
-    g = ((j * ca[1]) + ((1 - j) * cb[1]))|0;
-    b = ((j * ca[2]) + ((1 - j) * cb[2]))|0;
-    return [r, g, b];
-}
