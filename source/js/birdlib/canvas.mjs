@@ -30,7 +30,7 @@ export class blCanvas
         for (const canvas in this._attachedCanvases)
         {
             const context = this._attachedCanvases[canvas];
-            context.drawImage(this._canvas, 0, 0, this._width, this._height);
+            context.drawImage(this._canvas, 0, 0, context.canvas.width, context.canvas.height);
         }
     }
 
