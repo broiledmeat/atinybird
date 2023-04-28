@@ -1,4 +1,5 @@
 import {blCanvas} from "/js/birdlib/canvas.mjs";
+import {appendButtonInput} from "../../js/birdlib/form.mjs";
 
 const WIDTH = 800;
 const HEIGHT = 600;
@@ -198,17 +199,7 @@ window.onload = () =>
     coloution.attachCanvas(canvas);
     coloution.start();
 
-    const randomizeButton = document.getElementById("randomize");
-    const toggleHistoryButton = document.getElementById("toggle_history");
-
-    randomizeButton.onclick = () =>
-    {
-        coloution.randomize();
-        return false;
-    };
-    toggleHistoryButton.onclick = () =>
-    {
-        coloution.toggleHistory();
-        return false;
-    };
+    const form = document.getElementById("settings");
+    appendButtonInput(form, "Reset",  () => coloution.randomize());
+    appendButtonInput(form, "Toggle History",  () => coloution.toggleHistory());
 };

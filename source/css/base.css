@@ -93,6 +93,12 @@ body section > ul li + li
     border-top:             1px dotted #aaa;
 }
 
+form label
+{
+    display:                inline-block;
+    min-width:              6em;
+}
+
 footer
 {
     margin:                 0 0 0 2.5em;

@@ -1,5 +1,6 @@
 import {blCanvas} from "/js/birdlib/canvas.mjs";
-import {PALETTES} from "/js/birdlib/color.mjs";
+import {PALETTES, getPaletteArgb} from "/js/birdlib/color.mjs";
+import {appendButtonInput, appendPaletteInput, appendRangeInput} from "../../js/birdlib/form.mjs";
 
 const WIDTH = 300;
 const HEIGHT = 300;
@@ -14,17 +15,17 @@ class ConvectionDiffusion extends blCanvas
     {
         super(width, height);
 
-        this._uChange = 0.1;
-        this._vectorStrength = 0.35;
+        this.palette = PALETTES[Object.keys(PALETTES)[0]];
+        this.uChange = 0.1;
 
+        this.vectorStrength = 0.35;
         const length = width * height;
         this._uHigh = 0;
         this._uLow = 0;
         this._uCurrent = new Float32Array(length);
         this._uPrevious = new Float32Array(length);
-        this._vCurrent = new Float32Array(length);
 
-        this._palette = PALETTES[Object.keys(PALETTES)[0]];
+        this._vCurrent = new Float32Array(length);
 
         this._noise = new SimplexNoise.SimplexNoise2D();
         this._imageBuffer = this.createBuffer(width, height);
@@ -32,46 +33,6 @@ class ConvectionDiffusion extends blCanvas
         this._lastIterateTime = 0;
 
         this.randomize();
-    }
-
-    /**
-     * @param {Number[]} value
-     */
-    set palette(value)
-    {
-        this._palette = value;
-    }
-
-    /**
-     * @returns {Number}
-     */
-    get uChange()
-    {
-        return this._uChange;
-    }
-
-    /**
-     * @param {Number} value
-     */
-    set uChange(value)
-    {
-        this._uChange = value;
-    }
-
-    /**
-     * @returns {Number}
-     */
-    get vectorStrength()
-    {
-        return this._vectorStrength;
-    }
-
-    /**
-     * @param {Number} value
-     */
-    set vectorStrength(value)
-    {
-        this._vectorStrength = value;
     }
 
     start()
@@ -113,26 +74,7 @@ class ConvectionDiffusion extends blCanvas
      */
     _getColor(value)
     {
-        let i = value * (this._palette.length - 1);
-        let j = i - (i | 0);
-
-        let ca = this._palette[(i + 1) | 0];
-        let cb = this._palette[i | 0];
-
-        if (cb === undefined) {
-            // console.log(`bad color! ${i} ${i | 0}`)
-            return 0xffff00ff;
-        }
-
-        if (ca === undefined)
-        {
-            return cb;
-        }
-
-        return (0xff << 24) |
-            ((((j * ca[0]) + ((1 - j) * cb[0])) | 0) << 16) |
-            ((((j * ca[1]) + ((1 - j) * cb[1])) | 0) << 8) |
-            (((j * ca[2]) + ((1 - j) * cb[2])) | 0);
+        return getPaletteArgb(this.palette, value);
     }
 
     _draw(time)
@@ -214,7 +156,7 @@ class ConvectionDiffusion extends blCanvas
     _getSteps(time)
     {
         const deltaTime = time - this._lastIterateTime;
-        const steps = Math.floor(deltaTime / 20);
+        const steps = Math.floor(deltaTime / 3);
 
         if (steps > 0)
         {
@@ -231,8 +173,8 @@ class ConvectionDiffusion extends blCanvas
         const uCurrent = this._uCurrent;
         const uPrevious = this._uPrevious;
         const vCurrent = this._vCurrent;
-        const uChange = this._uChange;
-        const vectorStrength = this._vectorStrength;
+        const uChange = this.uChange;
+        const vectorStrength = this.vectorStrength;
         const uLowOriginal = this._uLow;
         const uDiffOriginal = this._uHigh - this._uLow;
 
@@ -289,28 +231,9 @@ window.onload = () =>
     convectionDiffusion.attachCanvas(canvas);
     convectionDiffusion.start();
 
-    let settingsForm = document.getElementById("settings");
-    let uChangeInput = document.getElementById("cu");
-    let vectorStrengthInput = document.getElementById("strength");
-    let paletteInput = document.getElementById("palette")
-
-    uChangeInput.value = convectionDiffusion.uChange;
-    vectorStrengthInput.value = convectionDiffusion.vectorStrength;
-    for (const name of Object.keys(PALETTES))
-    {
-        paletteInput.innerHTML += `<option value="${name}">${name}</option>`;
-    }
-
-    paletteInput.onchange = function()
-    {
-        convectionDiffusion.palette = PALETTES[paletteInput.value];
-    };
-
-    settingsForm.onsubmit = () =>
-    {
-        convectionDiffusion.uChange = parseFloat(uChangeInput.value);
-        convectionDiffusion.vectorStrength = parseFloat(vectorStrengthInput.value);
-        convectionDiffusion.randomize();
-        return false;
-    }
+    const form = document.getElementById("settings");
+    appendPaletteInput(form, "Palette", palette => convectionDiffusion.palette = palette);
+    appendRangeInput(form, "U", () => convectionDiffusion.uChange * 100, value => convectionDiffusion.uChange / 100, 0, 25);
+    appendRangeInput(form, "Strength", () => convectionDiffusion.vectorStrength * 100, value => convectionDiffusion.vectorStrength / 100, 0, 40);
+    appendButtonInput(form, "Reset",  () => convectionDiffusion.randomize());
 };

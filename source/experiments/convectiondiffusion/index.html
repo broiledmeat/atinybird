@@ -2,19 +2,13 @@
 set_context "name" "experiments.convectiondiffusion"
 set_context "title" "Convection Diffusion"
 set_context "description" "Convection-diffusion system implimentation."
-ext_css = ["convectiondiffusion.css"]
 ext_js = ["/js/simplexnoise.js"]
 ext_js_module = ["convectiondiffusion.js"]
 }}
 
 {{ capture content }}
 <canvas id="cvs"></canvas>
-<form id="settings">
-    <label for="palette">Palette:</label><select id="palette"></select><br><br>
-    <label for="cu">CU:</label><input type="text" id="cu"><br>
-    <label for="strength">Strength:</label><input type="text" id="strength"><br><br>
-    <input type="submit" value="Reset">
-</form>
+<form id="settings"></form>
 {{ end }}
 
 {{ include ".templates/default.html" }}
