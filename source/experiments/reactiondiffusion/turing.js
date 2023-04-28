@@ -1,283 +1,243 @@
-'use strict'
-var // Cell options
-      width = 60
-    , height = 60
-    , change_u = 2.6
-    , change_v = 24.0
+import {blCanvas} from "/js/birdlib/canvas.mjs";
+import {PALETTES, getPaletteArgb} from "/js/birdlib/color.mjs";
+import {appendButtonInput, appendPaletteInput, appendRangeInput} from "/js/birdlib/form.mjs";
 
-    // Display options
-    , color_sets =
-        [
-            ['war', [[35,15,43], [242,29,85], [235,235,188], [188,227,197], [130,179,174]]],
-            ['adrift in dreams', [[11,72,107], [59,134,134], [121,189,154], [168,219,168], [207,240,158]]],
-            ['hanger management', [[184,42,102], [184,195,178], [241,227,193], [221,206,189], [76,90,95]]],
-            ['rgbw', [[0,0,255], [0,255,0], [255,0,0], [255,255,255]]],
-            ['white-black', [[0,0,0], [255,255,255]]],
-            ['barf', [[0,255,255], [255,0,255], [0,255,255], [255,0,255], [0,255,255], [255,0,255], [0,255,255], [255,0,255], [0,255,255], [255,0,255]]]
-        ]
-    , color_set = color_sets[0][1]
-    , draw_scale = 5
-    , delay = 10
+const WIDTH = 300;
+const HEIGHT = 300;
 
-    // Init some stuff
-    , ctx = null
-    , img = null
-    , timer = null
-    , u_data = []
-    , v_data = []
-    , u_gen = []
-    , v_gen = []
-    , high_u = 0
-    , low_u = 0
-    , draw_func = null;
+class Turing extends blCanvas
+{
+    /**
+     * @param {Number} width
+     * @param {Number} height
+     */
+    constructor(width, height)
+    {
+        super(width, height);
+
+        this.palette = PALETTES[Object.keys(PALETTES)[0]];
+        this.uChange = 2.6;
+        this.vChange = 24.0;
+        this._initBoxScale = 0.15;
+
+        const length = width * height;
+        this._uHigh = 0;
+        this._uLow = 0;
+        this._uCurrent = new Float32Array(length);
+        this._uPrevious = new Float32Array(length);
+        this._vCurrent = new Float32Array(length);
+        this._vPrevious = new Float32Array(length);
+
+        this._imageBuffer = this.createBuffer(width, height);
+        this._lastIterateTime = 0;
+
+        this.randomize();
+    }
+
+    start()
+    {
+        requestAnimationFrame(t => this._draw(t));
+    }
+
+    randomize()
+    {
+        const uPrevious = this._uPrevious;
+        const vPrevious = this._vPrevious;
+
+        this._uHigh = 0;
+        this._uLow = 1;
+
+        for (let y = 0; y < this._height; y++)
+        {
+            for (let x = 0; x < this._width; x++)
+            {
+                let u = (Math.random() * 12.0) + (Math.random() * 2.0);
+                let v = (Math.random() * 12.0) + (Math.random() * 2.0);
+
+                this._setCell(uPrevious, x, y, u);
+                this._setCell(vPrevious, x, y, v);
+
+                this._uHigh = Math.max(this._uHigh, u);
+                this._uLow = Math.min(this._uLow, u);
+            }
+        }
+    }
+
+    /**
+     * @param {Number} value
+     * @returns {Number}
+     * @private
+     */
+    _getColor(value)
+    {
+        const i = (value - this._uLow) / (this._uHigh - this._uLow);
+        return getPaletteArgb(this.palette, i);
+    }
+
+    _draw(time)
+    {
+        requestAnimationFrame(t => this._draw(t));
+
+        const steps = this._getSteps(time);
+
+        if (steps === 0)
+        {
+            return;
+        }
+
+        for (let _ = 0; _ < steps; _++)
+        {
+            this._iterate();
+        }
+
+        const buffer = this._imageBuffer.buffer;
+        const width = this._width;
+        const height = this._height;
+        const uCurrent = this._uCurrent;
+
+        for (let y = 0; y < height; y++)
+        {
+            for (let x = 0; x < width; x++)
+            {
+                let cell = this._getCell(uCurrent, x, y);
+                buffer[(y * width) + x] = this._getColor(cell);
+            }
+        }
+
+        this._imageBuffer.draw(this._context, 0, 0);
+        this.pushToAttachedCanvases();
+    }
+
+    _wrapWidth(x)
+    {
+        return ((x % this._width) + this._width) % this._width;
+    }
+
+    _wrapHeight(y)
+    {
+        return ((y % this._height) + this._height) % this._height;
+    }
+
+    /**
+     * @param {Float32Array} data
+     * @param {Number} x
+     * @param {Number} y
+     * @param {Number} value
+     * @private
+     */
+    _setCell(data, x, y, value)
+    {
+        x = this._wrapWidth(x);
+        y = this._wrapHeight(y);
+        data[(y * this._width) + x] = value;
+    }
+
+    /**
+     * @param {Float32Array} data
+     * @param {Number} x
+     * @param {Number} y
+     * @returns {Number}
+     * @private
+     */
+    _getCell(data, x, y)
+    {
+        x = this._wrapWidth(x);
+        y = this._wrapHeight(y);
+        return data[(y * this._width) + x];
+    }
+
+    /**
+     * @returns {number}
+     */
+    _getSteps(time)
+    {
+        const deltaTime = time - this._lastIterateTime;
+        const steps = Math.floor(deltaTime / 3);
+
+        if (steps > 0)
+        {
+            this._lastIterateTime = time;
+        }
+
+        return Math.min(steps, 32);
+    }
+
+    _iterate()
+    {
+        const width = this._width;
+        const height = this._height;
+        const uCurrent = this._uCurrent;
+        const uPrevious = this._uPrevious;
+        const vCurrent = this._vCurrent;
+        const vPrevious = this._vPrevious;
+        const uChange = this.uChange;
+        const vChange = this.vChange;
+
+        let uHigh = 0;
+        let uLow = 1;
+
+        let u, v, diu, div, reu, rev, nu, nv;
+
+        for (let y = 0; y < height; y++)
+        {
+            for (let x = 0; x < width; x++)
+            {
+                u = this._getCell(uPrevious, x, y);
+                v = this._getCell(vPrevious, x, y);
+
+                diu = (uChange *
+                    (this._getCell(uPrevious, x + 1, y) - (2.0 * u) +
+                    this._getCell(uPrevious, x - 1, y) +
+                    this._getCell(uPrevious, x, y + 1) - (2.0 * u) +
+                    this._getCell(uPrevious, x, y - 1)));
+                reu = (u * v) - u - 12.0;
+                nu = Math.max(0, u + (0.01 * (reu + diu)));
+
+                div = (vChange *
+                    (this._getCell(vPrevious, x + 1, y) - (2.0 * v) +
+                    this._getCell(vPrevious, x - 1, y) +
+                    this._getCell(vPrevious, x, y + 1) - (2.0 * v) +
+                    this._getCell(vPrevious, x, y - 1)));
+                rev = 16.0 - (u * v);
+                nv = Math.max(0, v + (0.01 * (rev + div)));
+
+                this._setCell(uCurrent, x, y, nu);
+                this._setCell(vCurrent, x, y, nv);
+
+                uHigh = Math.max(uHigh, nu);
+                uLow = Math.min(uLow, nu);
+            }
+        }
+
+        this._uHigh = uHigh;
+        this._uLow = uLow;
+
+        const uSwap = this._uPrevious;
+        this._uPrevious = this._uCurrent;
+        this._uCurrent = uSwap;
+
+        const vSwap = this._vPrevious;
+        this._vPrevious = this._vCurrent;
+        this._vCurrent = vSwap;
+
+    }
+}
 
 window.onload = function()
 {
-    var   i
-        , width_input = document.getElementById('width')
-        , height_input = document.getElementById('height')
-        , scale_input = document.getElementById('scale')
-        , delay_input = document.getElementById('delay')
-        , change_u_input = document.getElementById('cu')
-        , change_v_input = document.getElementById('cv')
-        , palette_input = document.getElementById('palette')
-        , settings_form = document.getElementById('settings');
+    const canvas = document.getElementById("cvs");
+    canvas.width = WIDTH * 1.5;
+    canvas.height = HEIGHT * 1.5;
+    canvas.imageSmoothingEnabled = false;
 
-    width_input.value = width;
-    height_input.value = height;
-    scale_input.value = draw_scale;
-    delay_input.value = delay;
-    change_u_input.value = change_u;
-    change_v_input.value = change_v;
-    palette_input.innerHTML = '';
-    for (i = 0; i < color_sets.length; i++)
-    {
-        palette_input.innerHTML += '<option value="' + i + '">' + color_sets[i][0] + '</option>';
-    }
-    palette_input.onchange = function()
-    {
-        color_set = color_sets[parseInt(palette_input.value, 10)][1];
-    };
-    settings_form.onsubmit = function()
-    {
-        width = parseInt(width_input.value, 10);
-        height = parseInt(height_input.value, 10);
-        draw_scale = parseInt(scale_input.value, 10);
-        delay = parseInt(delay_input.value, 10);
-        change_u = parseFloat(change_u_input.value);
-        change_v = parseFloat(change_v_input.value);
+    const turing = new Turing(WIDTH, HEIGHT);
+    turing.attachCanvas(canvas);
+    turing.start();
 
-        init();
-        return false;
-    };
-
-    init();
+    const form = document.getElementById("settings");
+    appendPaletteInput(form, "Palette", palette => turing.palette = palette);
+    appendRangeInput(form, "U", () => turing.uChange * 100, value => turing.uChange = value / 100, 0, 500);
+    appendRangeInput(form, "V", () => turing.vChange, value => turing.vChange = value, 0, 50);
+    appendButtonInput(form, "Reset", () => turing.randomize());
 };
 
-function init()
-{
-    var   i
-        , cvs = document.getElementById('cvs');
-
-    clearTimeout(timer);
-
-    cvs.width = width * draw_scale;
-    cvs.height = height * draw_scale;
-
-    ctx = cvs.getContext('2d');
-    img = ctx.createImageData(width * draw_scale, height * draw_scale);
-
-    for (i = 0; i < (img.width * img.height * 4) + 3; i++)
-    {
-        img.data[i] = 255;
-    }
-    
-    if (draw_scale === 1)
-    {
-        draw_func = drawImg;
-    }
-    else
-    {
-        draw_func = drawImgScaled;
-    }
-
-    randomizeDataMaps();
-    timer = setInterval(iterate, delay);
-}
-
-function iterate()
-{
-    var   x, y
-        , u, v
-        , diu, div
-        , reu, rev
-        , nu, nv;
-
-    low_u = high_u;
-    high_u = 0;
-
-    for (y = 0; y < height; y++)
-    {
-        for (x = 0; x < width; x++)
-        {
-            u = getCell(u_data, x, y);
-            v = getCell(v_data, x, y);
-            
-            diu = change_u * (getCell(u_data, x + 1, y) - (2.0 * u) + getCell(u_data, x - 1, y) + getCell(u_data, x, y + 1) - (2.0 * u) + getCell(u_data, x, y - 1));
-            reu = (u * v) - u - 12.0;
-            nu = u + (0.01 * (reu + diu));
-            if (nu < 0.0) { nu = 0.0; }
-
-            div = change_v * (getCell(v_data, x + 1, y) - (2.0 * v) + getCell(v_data, x - 1, y) + getCell(v_data, x, y + 1) - (2.0 * v) + getCell(v_data, x, y - 1));
-            rev = 16.0 - (u * v);
-            nv = v + (0.01 * (rev + div));
-            if (nv < 0.0) { nv = 0.0; }
-
-            if (nu > high_u)
-            {
-                high_u = nu;
-            }
-            if (nu < low_u)
-            {
-                low_u = nu;
-            }
-
-            setCell(u_gen, x, y, nu);
-            setCell(v_gen, x, y, nv);
-        }
-    }
-
-    u_data = u_gen.slice();
-    v_data = v_gen.slice();
-    draw_func();
-}
-
-function drawImg()
-{
-    var   x, y
-        , i, c;
-  
-    for (y = 0; y < height; y++)
-    {
-        for (x = 0; x < width; x++)
-        {
-            c = getColor(getCell(u_data, x, y));
-            i = ((y * width * draw_scale * draw_scale) + (x * draw_scale)) * 4;
-            img.data[i    ] = c[0];
-            img.data[i + 1] = c[1];
-            img.data[i + 2] = c[2];
-        }
-    }
-
-    ctx.putImageData(img, 0, 0);
-}
-
-function drawImgScaled()
-{
-    var   x, y
-        , u, v
-        , i, iy, ix, c;
-  
-    for (y = 0; y < height; y++)
-    {
-        for (x = 0; x < width; x++)
-        {
-            c = getColor(getCell(u_data, x, y));
-
-            i = (y * width * draw_scale * draw_scale) + (x * draw_scale);
-            for (v = 0; v < draw_scale; v++)
-            {
-                iy = i + (v * width * draw_scale);
-                for (u = 0; u < draw_scale; u++)
-                {
-                    ix = (iy + u) * 4;
-                    img.data[ix    ] = c[0];
-                    img.data[ix + 1] = c[1];
-                    img.data[ix + 2] = c[2];
-                }
-            }
-        }
-    }
-
-    ctx.putImageData(img, 0, 0);
-}
-
-function emptyDataMap()
-{
-    var   i
-        , data = new Array(width * height);
-
-    for (i = 0; i < width * height; i++)
-    {
-        data[i] = 0;
-    }
-
-    return data;
-}
-
-function randomizeDataMaps()
-{
-    var   x, y
-        , u;
-
-    u_data = emptyDataMap();
-    v_data = emptyDataMap();
-    u_gen = emptyDataMap();
-    v_gen = emptyDataMap();
-    high_u = 0;
-    low_u = 12;
-
-    for (y = 0; y < height; y++)
-    {
-        for (x = 0; x < width; x++)
-        {
-            u = (Math.random() * 12.0) + (Math.random() * 2.0);
-
-            if (u > high_u)
-            {
-                high_u = u;
-            }
-
-            if (u < low_u)
-            {
-                low_u = u;
-            }
-
-            setCell(u_data, x, y, u);
-            setCell(v_data, x, y, (Math.random() * 12.0) + (Math.random() * 2.0));
-        }
-    }
-}
-
-function getCell(data, x, y)
-{
-    if (x === -1) { x = width - 1; } else if (x === width) { x = 0; }
-    if (y === -1) { y = height - 1; } else if (y === height) { y = 0; }
-    return data[(y * width) + x];
-}
-
-function setCell(data, x, y, val)
-{
-    if (x === -1) { x = width - 1; } else if (x === width) { x = 0; }
-    if (y === -1) { y = height - 1; } else if (y === height) { y = 0; }
-    data[(y * width) + x] = val;
-}
-
-function getColor(val)
-{
-    var   i, j
-        , ca, cb
-        , r, g, b;
-
-    i = ((val - low_u) / (high_u - low_u)) * (color_set.length - 1);
-    j = i - (i|0);
-    
-    ca = color_set[(i + 1)|0];
-    cb = color_set[i|0];
-    if (ca === undefined) { return cb; }
-
-    r = ((j * ca[0]) + ((1 - j) * cb[0]))|0;
-    g = ((j * ca[1]) + ((1 - j) * cb[1]))|0;
-    b = ((j * ca[2]) + ((1 - j) * cb[2]))|0;
-    return [r, g, b];
-}
