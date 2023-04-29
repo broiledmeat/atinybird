@@ -1,5 +1,6 @@
-build/
-build
-store/
-source_nest/
-.idea/
+/bin
+/build
+/store
+/source_nest
+.idea
+justfile
