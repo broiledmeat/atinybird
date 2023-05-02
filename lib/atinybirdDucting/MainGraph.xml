@@ -3,20 +3,20 @@
     <lib path="./ductworkScriban.dll"/>
     <logfile path="/home/derrick/projects/atinybird/store/mainBuild.log"/>
     <!-- Artifact processor -->
-    <component name="Finalizer" type="FinalizeArtifactsComponent" _guiPositionX="778" _guiPositionY="442"/>
+    <component name="Finalizer" type="FinalizeArtifactsComponent"/>
     <!-- Path iteration -->
-    <component name="PathIterator" type="DirectoryFilePathIteratorComponent" _guiPositionX="6" _guiPositionY="170">
+    <component name="PathIterator" type="DirectoryFilePathIteratorComponent">
         <set name="Path">/home/derrick/projects/atinybird/source</set>
     </component>
-    <component name="IsTemplatePath" type="FilePathGlobMatchComponent" _guiPositionX="226" _guiPositionY="170">
+    <component name="IsTemplatePath" type="FilePathGlobMatchComponent">
         <set name="Glob">**/*.html</set>
     </component>
     <connection out="PathIterator.Out" in="IsTemplatePath.In"/>
     <!-- HTML Templating -->
-    <component name="TemplateParser" type="TemplateParserComponent" _guiPositionX="454" _guiPositionY="103"/>
-    <component name="TemplateParserComplete" type="InputAwaiterComponent:IFilePathArtifact" _guiPositionX="672"
+    <component name="TemplateParser" type="TemplateParserComponent"/>
+    <component name="TemplateParserComplete" type="InputAwaiterComponent:IFilePathArtifact"
                _guiPositionY="104"/>
-    <component name="TemplateRenderer" type="TemplateRendererComponent" _guiPositionX="885" _guiPositionY="106">
+    <component name="TemplateRenderer" type="TemplateRendererComponent">
         <set name="SourceRoot">/home/derrick/projects/atinybird/source</set>
         <set name="TargetRoot">/home/derrick/projects/atinybird/build</set>
     </component>
@@ -25,7 +25,7 @@
     <connection out="TemplateParserComplete.Out" in="TemplateRenderer.In"/>
     <connection out="TemplateRenderer.Out" in="Finalizer.In"/>
     <!-- File copying -->
-    <component name="FileCopy" type="CopyFilePathToTargetPathComponent" _guiPositionX="458" _guiPositionY="248">
+    <component name="FileCopy" type="CopyFilePathToTargetPathComponent">
         <set name="SourceRoot">/home/derrick/projects/atinybird/source</set>
         <set name="TargetRoot">/home/derrick/projects/atinybird/build</set>
     </component>
