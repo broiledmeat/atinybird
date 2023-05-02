@@ -52,7 +52,7 @@ namespace atinybirdDucting.Components
             {
                 lock (_lock)
                 {
-                    _thumbnails.Add(genThumbArtifact.SourcePath, genThumbArtifact.TargetPath);
+                    _thumbnails.Add(genThumbArtifact.FilePath, genThumbArtifact.TargetFilePath);
                 }
             }
     

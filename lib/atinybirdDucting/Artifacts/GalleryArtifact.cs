@@ -7,30 +7,20 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using ductwork;
 using ductwork.Artifacts;
 using SixLabors.ImageSharp;
 using Force.Crc32;
 using Scriban;
 using Scriban.Functions;
-using Scriban.Runtime;
 
 #nullable enable
 namespace atinybirdDucting.Artifacts
 {
-    public class GalleryArtifact : IFinalizingArtifact
+    public class GalleryArtifact : Artifact, ITargetFilePathArtifact, IFinalizingArtifact
     {
-        public readonly string SourceRoot;
-        public readonly HashSet<string> Directories;
-        public readonly Dictionary<string, string?> Files;
-        public readonly string TargetRoot;
-        public readonly string TargetPath;
         private static readonly Dictionary<string, Template> TemplateCache = new();
         private static readonly object TemplateCacheLock = new();
-
-        public string GallerySourceRoot { get; }
-        public string GalleryTargetRoot { get; }
-        public string GalleryTemplateName { get; }
-        public string GalleryOutputName { get; }
 
         public GalleryArtifact(
             string gallerySourceRoot,
@@ -51,18 +41,28 @@ namespace atinybirdDucting.Artifacts
             TargetRoot = Path.Combine(
                 GalleryTargetRoot,
                 Path.GetRelativePath(GallerySourceRoot, SourceRoot));
-            TargetPath = Path.Combine(TargetRoot, GalleryOutputName);
+            TargetFilePath = Path.Combine(TargetRoot, GalleryOutputName);
 
-            var crc = Crc32Algorithm.Compute(Encoding.UTF8.GetBytes(SourceRoot));
+            var sourceFileNames = files.Keys
+                .NotNull()
+                .Select(Path.GetFileName)
+                .Select(filename => Encoding.UTF8.GetBytes(filename!))
+                .Cast<object>()
+                .ToArray();
 
-            crc = files.Keys
-                .Aggregate(crc, (current, path) => Crc32Algorithm.Append(current, Encoding.UTF8.GetBytes(path)));
-
-            ContentId = crc.ToString();
+            Id = TargetFilePath;
+            Checksum = CreateChecksum(sourceFileNames);
         }
 
-        public string Id => TargetPath;
-        public string ContentId { get; }
+        public string SourceRoot { get; }
+        public HashSet<string> Directories { get; }
+        public Dictionary<string, string?> Files { get; }
+        public string TargetRoot { get; }
+        public string TargetFilePath { get; }
+        public string GallerySourceRoot { get; }
+        public string GalleryTargetRoot { get; }
+        public string GalleryTemplateName { get; }
+        public string GalleryOutputName { get; }
 
         public async Task<bool> Finalize(CancellationToken token)
         {
@@ -101,7 +101,7 @@ namespace atinybirdDucting.Artifacts
             var context = new TemplateContext(script);
             var content = await template.RenderAsync(context) ?? string.Empty;
 
-            await File.WriteAllTextAsync(TargetPath, content, token);
+            await File.WriteAllTextAsync(TargetFilePath, content, token);
 
             return await Task.FromResult(true);
         }
