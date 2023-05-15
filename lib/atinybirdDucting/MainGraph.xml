@@ -31,9 +31,4 @@
 
     <!-- File copying -->
     <connection out="IsTemplatePath.False" in="WriteToTarget.In"/>
-
-    <!-- Orphan cleanup -->
-<!--    <component name="Cleanup" type="CleanupDirectoryComponent">-->
-<!--        <set name="TargetRoot">/home/derrick/projects/atinybird/build/</set>-->
-<!--    </component>-->
 </graph>

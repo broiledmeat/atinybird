@@ -29,13 +29,4 @@
     </component>
     <connection out="SetTargetPath.Out" in="Gallery.In"/>
     <connection out="GenerateThumb.Out" in="Gallery.In"/>
-
-    <!--    &lt;!&ndash; Orphan cleanup &ndash;&gt;-->
-    <!--    <component name="Cleanup" type="CleanupDirectoryComponent">-->
-    <!--        <set name="TargetRoot">/home/derrick/projects/atinybird/build/nest/</set>-->
-    <!--    </component>-->
-
-    <!--    <connection out="FileCopy.Out" in="Cleanup.In"/>-->
-    <!--    <connection out="GenerateThumb.Out" in="Cleanup.In"/>-->
-    <!--    <connection out="Gallery.Out" in="Cleanup.In"/>-->
 </graph>
