@@ -14,8 +14,8 @@
 
     <ItemGroup>
       <PackageReference Include="Crc32.NET" Version="1.2.0" />
-      <PackageReference Include="Scriban" Version="5.5.0" />
-      <PackageReference Include="SixLabors.ImageSharp" Version="1.0.4" />
+      <PackageReference Include="Scriban" Version="5.7.0" />
+      <PackageReference Include="SixLabors.ImageSharp" Version="3.0.1" />
       <PackageReference Include="System.Data.SQLite" Version="1.0.115.5" />
     </ItemGroup>
 
