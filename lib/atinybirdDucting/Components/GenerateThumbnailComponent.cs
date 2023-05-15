@@ -1,34 +1,51 @@
+using System.Data.Entity.Migrations.Model;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using atinybirdDucting.Artifacts;
-using ductwork;
 using ductwork.Artifacts;
 using ductwork.Components;
+using ductwork.Crates;
 using ductwork.Executors;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats;
+using SixLabors.ImageSharp.Formats.Webp;
 
-namespace atinybirdDucting.Components
+#nullable enable
+namespace atinybirdDucting.Components;
+
+public class GenerateThumbnailComponent : SingleInSingleOutComponent
 {
-    public class GenerateThumbnailComponent : SingleInSingleOutComponent
+    public Setting<Size> Size = new Size(240, 160);
+
+    private const string TargetPathExtension = "webp";
+    private static readonly IImageEncoder Encoder = new WebpEncoder();
+
+    protected override async Task ExecuteIn(IExecutor executor, ICrate crate, CancellationToken token)
     {
-        public Setting<string> SourceRoot = new();
-        public Setting<string> TargetRoot = new();
-        
-        protected override async Task ExecuteIn(IExecutor executor, IArtifact artifact, CancellationToken token)
+        if (crate.Get<ISourcePathArtifact>() is not { } sourcePathArtifact ||
+            crate.Get<ITargetPathArtifact>() is not { } targetPathArtifact)
         {
-            if (artifact is not IFilePathArtifact filePathArtifact)
-            {
-                return;
-            }
-            
-            var relativePath = Path.GetRelativePath(SourceRoot, filePathArtifact.FilePath); 
-            var targetPath = Path.Combine(
-                TargetRoot, 
-                Path.GetDirectoryName(relativePath) ?? string.Empty,
-                ".thumb",
-                Path.GetFileNameWithoutExtension(relativePath) + ".png");
-            var thumbnailArtifact = new ThumbnailArtifact(filePathArtifact.FilePath, targetPath);
-            await executor.Push(Out, thumbnailArtifact);
+            return;
         }
+
+        var thumbnailArtifact = new ThumbnailArtifact(sourcePathArtifact.SourcePath, Encoder, Size);
+
+        if (!await thumbnailArtifact.IsSourcePathValidImage(token))
+        {
+            return;
+        }
+
+        var targetPath = Path.Combine(
+            Path.GetDirectoryName(targetPathArtifact.TargetPath) ?? string.Empty,
+            ".thumb",
+            $"{Path.GetFileNameWithoutExtension(targetPathArtifact.TargetPath)}.{TargetPathExtension}");
+
+        await executor.Push(
+            Out,
+            executor.CreateCrate(
+                crate,
+                thumbnailArtifact,
+                new TargetPathArtifact(targetPath)));
     }
 }
