@@ -4,39 +4,38 @@
     <lib path="./ductworkScriban.dll"/>
     <logfile path="/home/derrick/projects/atinybird/store/nestBuild.log"/>
 
-    <!-- Artifact processor -->
-    <component name="Finalizer" type="FinalizeArtifactsComponent"/>
-
-    <!-- Path iteration for visible files under /nest/ -->
-    <component name="PathIterator" type="DirectoryFilePathIteratorComponent">
-        <set name="Path">/home/derrick/projects/atinybird/source_nest</set>
+    <component name="PathIterator" type="RootSourcePathIteratorComponent">
+        <set name="SourceRoot">/home/derrick/projects/atinybird/source_nest</set>
     </component>
+    <component name="SetTargetPath" type="TransformSourcePathToTargetPathComponent">
+        <set name="SourceRoot">/home/derrick/projects/atinybird/source_nest</set>
+        <set name="TargetRoot">/home/derrick/projects/atinybird/build/nest</set>
+    </component>
+    <connection out="PathIterator.Out" in="SetTargetPath.In"/>
+
+    <component name="WriteToTarget" type="WriteContentToTargetPathComponent"/>
 
     <!-- File copying -->
-    <component name="FileCopy" type="CopyFilePathToTargetPathComponent">
-        <set name="SourceRoot">/home/derrick/projects/atinybird/source_nest</set>
-        <set name="TargetRoot">/home/derrick/projects/atinybird/build/nest</set>
-    </component>
-
-    <connection out="PathIterator.Out" in="FileCopy.In"/>
-    <connection out="FileCopy.Out" in="Finalizer.In"/>
+    <connection out="SetTargetPath.Out" in="WriteToTarget.In"/>
 
     <!-- Thumbnail generation -->
-    <component name="GenerateThumb" type="GenerateThumbnailComponent">
-        <set name="SourceRoot">/home/derrick/projects/atinybird/source_nest</set>
-        <set name="TargetRoot">/home/derrick/projects/atinybird/build/nest</set>
-    </component>
-
-    <connection out="PathIterator.Out" in="GenerateThumb.In"/>
-    <connection out="GenerateThumb.Out" in="Finalizer.In"/>
+    <component name="GenerateThumb" type="GenerateThumbnailComponent"/>
+    <connection out="SetTargetPath.Out" in="GenerateThumb.In"/>
+    <connection out="GenerateThumb.Out" in="WriteToTarget.In"/>
 
     <!-- Index generation -->
     <component name="Gallery" type="GalleryComponent">
         <set name="SourceRoot">/home/derrick/projects/atinybird/source_nest</set>
-        <set name="TargetRoot">/home/derrick/projects/atinybird/build/nest</set>
     </component>
-    <component name="GalleryFinalizer" type="FinalizeArtifactsComponent"/>
+    <connection out="SetTargetPath.Out" in="Gallery.In"/>
+    <connection out="GenerateThumb.Out" in="Gallery.In"/>
 
-    <connection out="Finalizer.Out" in="Gallery.In"/>
-    <connection out="Gallery.Out" in="GalleryFinalizer.In"/>
+    <!--    &lt;!&ndash; Orphan cleanup &ndash;&gt;-->
+    <!--    <component name="Cleanup" type="CleanupDirectoryComponent">-->
+    <!--        <set name="TargetRoot">/home/derrick/projects/atinybird/build/nest/</set>-->
+    <!--    </component>-->
+
+    <!--    <connection out="FileCopy.Out" in="Cleanup.In"/>-->
+    <!--    <connection out="GenerateThumb.Out" in="Cleanup.In"/>-->
+    <!--    <connection out="Gallery.Out" in="Cleanup.In"/>-->
 </graph>
