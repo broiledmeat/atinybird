@@ -1,34 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <graph>
-    <lib path="./ductworkScriban.dll"/>
-    <logfile path="/home/derrick/projects/atinybird/store/mainBuild.log"/>
-    
+    <lib path="ductworkScriban.dll"/>
+    <logfile path="./store/mainBuild.log"/>
+
+    <!-- Get all source paths in the source root, recursively -->
     <component name="PathIterator" type="RootSourcePathIteratorComponent">
-        <set name="SourceRoot">/home/derrick/projects/atinybird/source</set>
+        <set name="SourceRoot">./source</set>
     </component>
+
+    <!-- Translate the source paths in to build target paths -->
     <component name="SetTargetPath" type="TransformSourcePathToTargetPathComponent">
-        <set name="SourceRoot">/home/derrick/projects/atinybird/source</set>
-        <set name="TargetRoot">/home/derrick/projects/atinybird/build</set>
+        <set name="SourceRoot">./source</set>
+        <set name="TargetRoot">./build</set>
     </component>
+    <connection out="PathIterator.Out" in="SetTargetPath.In"/>
+
+    <!-- Split static files and HTML templates -->
     <component name="IsTemplatePath" type="SourcePathGlobMatchComponent">
         <set name="Glob">**/*.html</set>
     </component>
-    <connection out="PathIterator.Out" in="SetTargetPath.In"/>
     <connection out="SetTargetPath.Out" in="IsTemplatePath.In"/>
-    
-    <component name="WriteToTarget" type="WriteContentToTargetPathComponent"/>
 
-    <!-- HTML Templating -->
+    <!-- Static files just get copied over to the target root -->
+    <component name="WriteToTarget" type="WriteContentToTargetPathComponent"/>
+    <connection out="IsTemplatePath.False" in="WriteToTarget.In"/>
+
+    <!-- HTML templates are built, and the contents moved to the target root -->
     <component name="TemplateParser" type="TemplateParserComponent">
-        <set name="SourceRoot">/home/derrick/projects/atinybird/source</set>
-    </component>
-    <component name="TemplateRenderer" type="TemplateRendererComponent">
-        <set name="SourceRoot">/home/derrick/projects/atinybird/source</set>
+        <set name="SourceRoot">./source</set>
     </component>
     <connection out="IsTemplatePath.True" in="TemplateParser.In"/>
-    <connection out="TemplateParser.Out" in="TemplateRenderer.In"/>
-    <connection out="TemplateRenderer.Out" in="WriteToTarget.In"/>
 
-    <!-- File copying -->
-    <connection out="IsTemplatePath.False" in="WriteToTarget.In"/>
+    <component name="TemplateRenderer" type="TemplateRendererComponent">
+        <set name="SourceRoot">./source</set>
+    </component>
+    <connection out="TemplateParser.Out" in="TemplateRenderer.In"/>
+
+    <connection out="TemplateRenderer.Out" in="WriteToTarget.In"/>
 </graph>

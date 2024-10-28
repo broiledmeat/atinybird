@@ -1,21 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <graph>
-    <lib path="./atinybirdDucting.dll"/>
-    <lib path="./ductworkScriban.dll"/>
-    <logfile path="/home/derrick/projects/atinybird/store/nestBuild.log"/>
+    <lib path="ductworkScriban.dll"/>
+    <lib path="atinybirdDucting.dll"/>
+    <logfile path="./store/nestBuild.log"/>
 
+    <!-- Get all source paths in the source root, recursively -->
     <component name="PathIterator" type="RootSourcePathIteratorComponent">
-        <set name="SourceRoot">/home/derrick/projects/atinybird/source_nest</set>
+        <set name="SourceRoot">./source_nest</set>
     </component>
+
+    <!-- Translate the source paths in to build target paths -->
     <component name="SetTargetPath" type="TransformSourcePathToTargetPathComponent">
-        <set name="SourceRoot">/home/derrick/projects/atinybird/source_nest</set>
-        <set name="TargetRoot">/home/derrick/projects/atinybird/build/nest</set>
+        <set name="SourceRoot">./source_nest</set>
+        <set name="TargetRoot">./build/nest</set>
     </component>
     <connection out="PathIterator.Out" in="SetTargetPath.In"/>
 
-    <component name="WriteToTarget" type="WriteContentToTargetPathComponent"/>
-
     <!-- File copying -->
+    <component name="WriteToTarget" type="WriteContentToTargetPathComponent"/>
     <connection out="SetTargetPath.Out" in="WriteToTarget.In"/>
 
     <!-- Thumbnail generation -->
@@ -25,7 +27,7 @@
 
     <!-- Index generation -->
     <component name="Gallery" type="GalleryComponent">
-        <set name="SourceRoot">/home/derrick/projects/atinybird/source_nest</set>
+        <set name="SourceRoot">./source_nest</set>
     </component>
     <connection out="SetTargetPath.Out" in="Gallery.In"/>
     <connection out="GenerateThumb.Out" in="Gallery.In"/>
