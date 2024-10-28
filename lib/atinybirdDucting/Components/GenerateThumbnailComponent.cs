@@ -1,4 +1,3 @@
-using System.Data.Entity.Migrations.Model;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,10 +10,9 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Webp;
 
-#nullable enable
 namespace atinybirdDucting.Components;
 
-public class GenerateThumbnailComponent : SingleInSingleOutComponent
+public record GenerateThumbnailComponent : SingleInSingleOutComponent
 {
     public Setting<Size> Size = new Size(240, 160);
 

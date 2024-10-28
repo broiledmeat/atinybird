@@ -7,27 +7,15 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Processing;
 
-#nullable enable
 namespace atinybirdDucting.Artifacts;
 
-public class ThumbnailArtifact : Artifact, ISourcePathArtifact
+public record ThumbnailArtifact(string SourcePath, IImageEncoder Encoder, Size Size) : Artifact, ISourcePathArtifact
 {
     private readonly SemaphoreSlim _semaphore = new(1, 1);
     private byte[]? _cachedContent;
     private Exception? _cachedException;
     private bool? _isValid;
 
-    public ThumbnailArtifact(string sourcePath, IImageEncoder encoder, Size size)
-    {
-        SourcePath = sourcePath;
-        Encoder = encoder;
-        Size = size;
-    }
-
-    public string SourcePath { get; }
-    public IImageEncoder Encoder { get; }
-    public Size Size { get; }
-    
     public async Task<byte[]> GetContent(CancellationToken token)
     {
         await _semaphore.WaitAsync(token);

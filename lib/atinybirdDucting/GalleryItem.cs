@@ -1,7 +1,6 @@
 using atinybirdDucting.Artifacts;
 using ductwork.Artifacts;
 
-#nullable enable
 namespace atinybirdDucting;
 
 public class GalleryItem

@@ -20,7 +20,7 @@ using SixLabors.ImageSharp.Metadata.Profiles.Exif;
 #nullable enable
 namespace atinybirdDucting.Components;
 
-public class GalleryComponent : SingleInComponent
+public record GalleryComponent : SingleInComponent
 {
     public Setting<string> SourceRoot = string.Empty;
     public Setting<string> SourceTemplateName = ".index.tmpl";
