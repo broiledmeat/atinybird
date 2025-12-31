@@ -31,7 +31,7 @@ public record GalleryComponent : SingleInComponent
     private readonly Dictionary<string, HashSet<GalleryItem>> _directoryItems = new();
 
     private static readonly Dictionary<string, Template> TemplateCache = new();
-    private static readonly object TemplateCacheLock = new();
+    private static readonly Lock TemplateCacheLock = new();
 
     protected override async Task ExecuteIn(IExecutor executor, ICrate crate, CancellationToken token)
     {

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <graph>
-    <lib path="./lib/atinybirdDucting/bin/Debug/net8.0/ductworkScriban.dll"/>
+    <lib path="./lib/atinybirdDucting/bin/Debug/net10.0/ductworkScriban.dll"/>
     <logfile path="./store/mainBuild.log"/>
 
     <!-- Get all source paths in the source root, recursively -->
